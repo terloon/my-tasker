@@ -1,0 +1,422 @@
+[
+  {
+    "id": "03-home",
+    "state": "empty",
+    "scrollWidth": 1280,
+    "title": "Home",
+    "width": 1280
+  },
+  {
+    "id": "03-home",
+    "state": "no-access",
+    "scrollWidth": 1280,
+    "title": "Home",
+    "width": 1280
+  },
+  {
+    "id": "03-home",
+    "state": "loading",
+    "scrollWidth": 1280,
+    "title": "Home",
+    "width": 1280
+  },
+  {
+    "id": "03-home",
+    "state": "read-only",
+    "scrollWidth": 1280,
+    "title": "Home",
+    "width": 1280
+  },
+  {
+    "id": "03-home",
+    "state": "blockers-ready",
+    "scrollWidth": 1280,
+    "title": "Home",
+    "width": 1280
+  },
+  {
+    "id": "05-planning",
+    "state": "selected",
+    "scrollWidth": 1280,
+    "title": "Planning",
+    "width": 1280
+  },
+  {
+    "id": "05-planning",
+    "state": "empty",
+    "scrollWidth": 1280,
+    "title": "Planning",
+    "width": 1280
+  },
+  {
+    "id": "05-planning",
+    "state": "loading",
+    "scrollWidth": 1280,
+    "title": "Planning",
+    "width": 1280
+  },
+  {
+    "id": "05-planning",
+    "state": "read-only",
+    "scrollWidth": 1280,
+    "title": "Planning",
+    "width": 1280
+  },
+  {
+    "id": "05-planning",
+    "state": "blockers-ready",
+    "scrollWidth": 1280,
+    "title": "Planning",
+    "width": 1280
+  },
+  {
+    "id": "06-item-list",
+    "state": "filters",
+    "scrollWidth": 1280,
+    "title": "Items",
+    "width": 1280
+  },
+  {
+    "id": "06-item-list",
+    "state": "empty",
+    "scrollWidth": 1280,
+    "title": "Items",
+    "width": 1280
+  },
+  {
+    "id": "06-item-list",
+    "state": "loading",
+    "scrollWidth": 1280,
+    "title": "Item list and query",
+    "width": 1280
+  },
+  {
+    "id": "06-item-list",
+    "state": "read-only",
+    "scrollWidth": 1280,
+    "title": "Items",
+    "width": 1280
+  },
+  {
+    "id": "06-item-list",
+    "state": "blockers-ready",
+    "scrollWidth": 1280,
+    "title": "Items",
+    "width": 1280
+  },
+  {
+    "id": "07-sprint-board",
+    "state": "planned",
+    "scrollWidth": 1280,
+    "title": "Sprint 2 · Collaboration",
+    "width": 1280
+  },
+  {
+    "id": "07-sprint-board",
+    "state": "closed",
+    "scrollWidth": 1280,
+    "title": "Sprint 1 · Core workflow",
+    "width": 1280
+  },
+  {
+    "id": "07-sprint-board",
+    "state": "empty",
+    "scrollWidth": 1280,
+    "title": "Sprint 1 · Core workflow",
+    "width": 1280
+  },
+  {
+    "id": "07-sprint-board",
+    "state": "loading",
+    "scrollWidth": 1280,
+    "title": "Sprint board",
+    "width": 1280
+  },
+  {
+    "id": "07-sprint-board",
+    "state": "read-only",
+    "scrollWidth": 1280,
+    "title": "Sprint 1 · Core workflow",
+    "width": 1280
+  },
+  {
+    "id": "07-sprint-board",
+    "state": "blockers-ready",
+    "scrollWidth": 1280,
+    "title": "Sprint 1 · Core workflow",
+    "width": 1280
+  },
+  {
+    "id": "08-item-detail",
+    "state": "editing",
+    "scrollWidth": 1280,
+    "title": "Build the sprint board",
+    "width": 1280
+  },
+  {
+    "id": "08-item-detail",
+    "state": "activity",
+    "scrollWidth": 1280,
+    "title": "Build the sprint board",
+    "width": 1280
+  },
+  {
+    "id": "08-item-detail",
+    "state": "uploading",
+    "scrollWidth": 1280,
+    "title": "Build the sprint board",
+    "width": 1280
+  },
+  {
+    "id": "08-item-detail",
+    "state": "closed-sprint",
+    "scrollWidth": 1280,
+    "title": "Build the sprint board",
+    "width": 1280
+  },
+  {
+    "id": "08-item-detail",
+    "state": "read-only",
+    "scrollWidth": 1280,
+    "title": "Build the sprint board",
+    "width": 1280
+  },
+  {
+    "id": "08-item-detail",
+    "state": "loading",
+    "scrollWidth": 1280,
+    "title": "Item detail",
+    "width": 1280
+  },
+  {
+    "id": "08-item-detail",
+    "state": "blocked",
+    "scrollWidth": 1280,
+    "title": "Add attachment previews",
+    "width": 1280
+  },
+  {
+    "id": "08-item-detail",
+    "state": "blockers-ready",
+    "scrollWidth": 1280,
+    "title": "All blockers are Done",
+    "width": 1280
+  },
+  {
+    "id": "08-item-detail",
+    "state": "blockers-ready-readonly",
+    "scrollWidth": 1280,
+    "title": "Add attachment previews",
+    "width": 1280
+  },
+  {
+    "id": "08-item-detail",
+    "state": "blockers-removed",
+    "scrollWidth": 1280,
+    "title": "Add attachment previews",
+    "width": 1280
+  },
+  {
+    "id": "08-item-detail",
+    "state": "resumed",
+    "scrollWidth": 1280,
+    "title": "Add attachment previews",
+    "width": 1280
+  },
+  {
+    "id": "17-item-create",
+    "state": "backlog",
+    "scrollWidth": 1280,
+    "title": "Create item",
+    "width": 1280
+  },
+  {
+    "id": "17-item-create",
+    "state": "validation",
+    "scrollWidth": 1280,
+    "title": "Create item",
+    "width": 1280
+  },
+  {
+    "id": "17-item-create",
+    "state": "submitting",
+    "scrollWidth": 1280,
+    "title": "Create item",
+    "width": 1280
+  },
+  {
+    "id": "17-item-create",
+    "state": "blocked",
+    "scrollWidth": 1280,
+    "title": "Create item",
+    "width": 1280
+  },
+  {
+    "id": "19-item-link",
+    "state": "parent",
+    "scrollWidth": 1280,
+    "title": "Link item",
+    "width": 1280
+  },
+  {
+    "id": "19-item-link",
+    "state": "no-results",
+    "scrollWidth": 1280,
+    "title": "Link item",
+    "width": 1280
+  },
+  {
+    "id": "19-item-link",
+    "state": "validation",
+    "scrollWidth": 1280,
+    "title": "Link item",
+    "width": 1280
+  },
+  {
+    "id": "19-item-link",
+    "state": "blocked-by",
+    "scrollWidth": 1280,
+    "title": "Link item",
+    "width": 1280
+  },
+  {
+    "id": "19-item-link",
+    "state": "blocks",
+    "scrollWidth": 1280,
+    "title": "Link item",
+    "width": 1280
+  },
+  {
+    "id": "26-delete-confirmation",
+    "state": "sprint",
+    "scrollWidth": 1280,
+    "title": "Delete sprint",
+    "width": 1280
+  },
+  {
+    "id": "26-delete-confirmation",
+    "state": "project",
+    "scrollWidth": 1280,
+    "title": "Delete project",
+    "width": 1280
+  },
+  {
+    "id": "26-delete-confirmation",
+    "state": "comment",
+    "scrollWidth": 1280,
+    "title": "Delete comment",
+    "width": 1280
+  },
+  {
+    "id": "26-delete-confirmation",
+    "state": "attachment",
+    "scrollWidth": 1280,
+    "title": "Delete attachment",
+    "width": 1280
+  },
+  {
+    "id": "26-delete-confirmation",
+    "state": "label",
+    "scrollWidth": 1280,
+    "title": "Delete label",
+    "width": 1280
+  },
+  {
+    "id": "26-delete-confirmation",
+    "state": "disable-user",
+    "scrollWidth": 1280,
+    "title": "Disable account",
+    "width": 1280
+  },
+  {
+    "id": "26-delete-confirmation",
+    "state": "rotate-agent",
+    "scrollWidth": 1280,
+    "title": "Rotate password",
+    "width": 1280
+  },
+  {
+    "id": "26-delete-confirmation",
+    "state": "blocked",
+    "scrollWidth": 1280,
+    "title": "This action is unavailable",
+    "width": 1280
+  },
+  {
+    "id": "26-delete-confirmation",
+    "state": "unlink-blocker",
+    "scrollWidth": 1280,
+    "title": "Remove blocker?",
+    "width": 1280
+  },
+  {
+    "id": "26-delete-confirmation",
+    "state": "unlink-last-blocker",
+    "scrollWidth": 1280,
+    "title": "Remove blocker?",
+    "width": 1280
+  },
+  {
+    "id": "26-delete-confirmation",
+    "state": "delete-blocker",
+    "scrollWidth": 1280,
+    "title": "Delete item and remove blocker links?",
+    "width": 1280
+  },
+  {
+    "id": "33-block-item",
+    "state": "existing-blockers",
+    "scrollWidth": 1280,
+    "title": "Move item to Blocked",
+    "width": 1280
+  },
+  {
+    "id": "33-block-item",
+    "state": "validation",
+    "scrollWidth": 1280,
+    "title": "Move item to Blocked",
+    "width": 1280
+  },
+  {
+    "id": "33-block-item",
+    "state": "conflict",
+    "scrollWidth": 1280,
+    "title": "Move item to Blocked",
+    "width": 1280
+  },
+  {
+    "id": "34-blockers-resolved",
+    "state": "read-only",
+    "scrollWidth": 1280,
+    "title": "All blockers are Done",
+    "width": 1280
+  },
+  {
+    "id": "34-blockers-resolved",
+    "state": "conflict",
+    "scrollWidth": 1280,
+    "title": "All blockers are Done",
+    "width": 1280
+  },
+  {
+    "id": "35-cancel-blocker",
+    "state": "remaining-done",
+    "scrollWidth": 1280,
+    "title": "Cancel item and remove blocker links?",
+    "width": 1280
+  },
+  {
+    "id": "35-cancel-blocker",
+    "state": "conflict",
+    "scrollWidth": 1280,
+    "title": "Cancel item and remove blocker links?",
+    "width": 1280
+  },
+  {
+    "id": "35-cancel-blocker",
+    "state": "read-only",
+    "scrollWidth": 1280,
+    "title": "Cancel item and remove blocker links?",
+    "width": 1280
+  }
+]

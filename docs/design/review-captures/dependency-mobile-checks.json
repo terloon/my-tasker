@@ -1,0 +1,69 @@
+[
+  {
+    "id": "03-home",
+    "scrollWidth": 388,
+    "width": 388
+  },
+  {
+    "id": "05-planning",
+    "scrollWidth": 388,
+    "width": 388
+  },
+  {
+    "id": "06-item-list",
+    "scrollWidth": 388,
+    "width": 388
+  },
+  {
+    "id": "07-sprint-board",
+    "scrollWidth": 388,
+    "width": 388
+  },
+  {
+    "id": "08-item-detail",
+    "scrollWidth": 388,
+    "width": 388
+  },
+  {
+    "id": "17-item-create",
+    "dialogScrollWidth": 362,
+    "dialogWidth": 362,
+    "scrollWidth": 388,
+    "width": 388
+  },
+  {
+    "id": "19-item-link",
+    "dialogScrollWidth": 362,
+    "dialogWidth": 362,
+    "scrollWidth": 388,
+    "width": 388
+  },
+  {
+    "id": "26-delete-confirmation",
+    "dialogScrollWidth": 362,
+    "dialogWidth": 362,
+    "scrollWidth": 388,
+    "width": 388
+  },
+  {
+    "id": "33-block-item",
+    "dialogScrollWidth": 362,
+    "dialogWidth": 362,
+    "scrollWidth": 388,
+    "width": 388
+  },
+  {
+    "id": "34-blockers-resolved",
+    "dialogScrollWidth": 362,
+    "dialogWidth": 362,
+    "scrollWidth": 388,
+    "width": 388
+  },
+  {
+    "id": "35-cancel-blocker",
+    "dialogScrollWidth": 362,
+    "dialogWidth": 362,
+    "scrollWidth": 388,
+    "width": 388
+  }
+]

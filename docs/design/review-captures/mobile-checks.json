@@ -1,0 +1,228 @@
+[
+  {
+    "id": "01-setup",
+    "scrollWidth": 388,
+    "title": "Create your administrator",
+    "width": 388
+  },
+  {
+    "id": "02-login",
+    "scrollWidth": 388,
+    "title": "Welcome back",
+    "width": 388
+  },
+  {
+    "id": "03-home",
+    "scrollWidth": 388,
+    "title": "Home",
+    "width": 388
+  },
+  {
+    "id": "04-project-overview",
+    "scrollWidth": 388,
+    "title": "Local Planner",
+    "width": 388
+  },
+  {
+    "id": "05-planning",
+    "scrollWidth": 388,
+    "title": "Planning",
+    "width": 388
+  },
+  {
+    "id": "06-item-list",
+    "scrollWidth": 388,
+    "title": "Items",
+    "width": 388
+  },
+  {
+    "id": "07-sprint-board",
+    "scrollWidth": 388,
+    "title": "Sprint 1 · Core workflow",
+    "width": 388
+  },
+  {
+    "id": "08-item-detail",
+    "scrollWidth": 388,
+    "title": "Build the sprint board",
+    "width": 388
+  },
+  {
+    "id": "09-users",
+    "scrollWidth": 388,
+    "title": "Users",
+    "width": 388
+  },
+  {
+    "id": "10-project-permissions",
+    "scrollWidth": 388,
+    "title": "Project permissions",
+    "width": 388
+  },
+  {
+    "id": "11-appearance",
+    "scrollWidth": 388,
+    "title": "Appearance",
+    "width": 388
+  },
+  {
+    "id": "12-account-security",
+    "scrollWidth": 388,
+    "title": "Account",
+    "width": 388
+  },
+  {
+    "id": "13-project-editor",
+    "dialogScrollWidth": 362,
+    "dialogWidth": 362,
+    "scrollWidth": 388,
+    "title": "Create project",
+    "width": 388
+  },
+  {
+    "id": "14-sprint-editor",
+    "dialogScrollWidth": 362,
+    "dialogWidth": 362,
+    "scrollWidth": 388,
+    "title": "Create sprint",
+    "width": 388
+  },
+  {
+    "id": "15-sprint-start",
+    "dialogScrollWidth": 362,
+    "dialogWidth": 362,
+    "scrollWidth": 388,
+    "title": "Start sprint",
+    "width": 388
+  },
+  {
+    "id": "16-sprint-close",
+    "dialogScrollWidth": 362,
+    "dialogWidth": 362,
+    "scrollWidth": 388,
+    "title": "Close sprint",
+    "width": 388
+  },
+  {
+    "id": "17-item-create",
+    "dialogScrollWidth": 362,
+    "dialogWidth": 362,
+    "scrollWidth": 388,
+    "title": "Create item",
+    "width": 388
+  },
+  {
+    "id": "18-item-move",
+    "dialogScrollWidth": 362,
+    "dialogWidth": 362,
+    "scrollWidth": 388,
+    "title": "Move items",
+    "width": 388
+  },
+  {
+    "id": "19-item-link",
+    "dialogScrollWidth": 362,
+    "dialogWidth": 362,
+    "scrollWidth": 388,
+    "title": "Link item",
+    "width": 388
+  },
+  {
+    "id": "20-label-manager",
+    "dialogScrollWidth": 362,
+    "dialogWidth": 362,
+    "scrollWidth": 388,
+    "title": "Project labels",
+    "width": 388
+  },
+  {
+    "id": "21-attachment-preview",
+    "dialogScrollWidth": 362,
+    "dialogWidth": 362,
+    "scrollWidth": 388,
+    "title": "board-reference.png",
+    "width": 388
+  },
+  {
+    "id": "22-user-editor",
+    "dialogScrollWidth": 362,
+    "dialogWidth": 362,
+    "scrollWidth": 388,
+    "title": "Create user",
+    "width": 388
+  },
+  {
+    "id": "23-user-detail",
+    "dialogScrollWidth": 362,
+    "dialogWidth": 362,
+    "scrollWidth": 388,
+    "title": "Calm Otter",
+    "width": 388
+  },
+  {
+    "id": "24-agent-credentials",
+    "dialogScrollWidth": 362,
+    "dialogWidth": 362,
+    "scrollWidth": 388,
+    "title": "Agent created",
+    "width": 388
+  },
+  {
+    "id": "25-password-editor",
+    "dialogScrollWidth": 362,
+    "dialogWidth": 362,
+    "scrollWidth": 388,
+    "title": "Change password",
+    "width": 388
+  },
+  {
+    "id": "26-delete-confirmation",
+    "dialogScrollWidth": 362,
+    "dialogWidth": 362,
+    "scrollWidth": 388,
+    "title": "Delete item",
+    "width": 388
+  },
+  {
+    "id": "27-edit-conflict",
+    "dialogScrollWidth": 362,
+    "dialogWidth": 362,
+    "scrollWidth": 388,
+    "title": "This changed while you were editing",
+    "width": 388
+  },
+  {
+    "id": "28-access-denied",
+    "scrollWidth": 388,
+    "title": "You do not have access to this page",
+    "width": 388
+  },
+  {
+    "id": "29-not-found",
+    "scrollWidth": 388,
+    "title": "Page not found",
+    "width": 388
+  },
+  {
+    "id": "30-service-unavailable",
+    "scrollWidth": 388,
+    "title": "Local Planner",
+    "width": 388
+  },
+  {
+    "id": "31-session-expired",
+    "dialogScrollWidth": 362,
+    "dialogWidth": 362,
+    "scrollWidth": 388,
+    "title": "Your session has expired",
+    "width": 388
+  },
+  {
+    "id": "32-unsaved-changes",
+    "dialogScrollWidth": 362,
+    "dialogWidth": 362,
+    "scrollWidth": 388,
+    "title": "Leave without saving?",
+    "width": 388
+  }
+]

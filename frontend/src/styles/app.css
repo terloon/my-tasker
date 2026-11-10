@@ -1,0 +1,271 @@
+.app {
+  min-height: 100vh;
+}
+.auth-page {
+  min-height: 100vh;
+}
+.sidebar {
+  height: 100vh;
+  position: sticky;
+  top: 0;
+}
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.person {
+  flex-wrap: nowrap;
+  gap: 7px;
+}
+.person > span:not(.avatar) {
+  overflow-wrap: anywhere;
+}
+.project-switch {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.brand {
+  white-space: nowrap;
+}
+.markdown {
+  margin: 12px 0 20px;
+  overflow-wrap: anywhere;
+}
+.markdown p + p {
+  margin-top: 10px;
+}
+.markdown ul,
+.markdown ol {
+  padding-left: 22px;
+}
+.markdown pre,
+.markdown code {
+  font-family: ui-monospace, monospace;
+}
+.markdown pre {
+  overflow: auto;
+  padding: 12px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+.markdown a {
+  overflow-wrap: anywhere;
+}
+.modal {
+  padding: 0;
+  color: var(--text);
+  margin: auto;
+  inset: 0;
+  max-height: calc(100dvh - 40px);
+}
+.modal::backdrop {
+  background: #09132280;
+}
+.modal .modal-footer {
+  flex-wrap: wrap;
+}
+.modal .modal-content {
+  overflow-wrap: anywhere;
+}
+.modal .field input,
+.modal .field textarea {
+  max-width: 100%;
+}
+.candidate-list {
+  max-height: 330px;
+  overflow: auto;
+}
+.event-details {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font:
+    12px/1.6 ui-monospace,
+    monospace;
+  max-height: 300px;
+  overflow: auto;
+  padding: 12px;
+  background: var(--bg);
+}
+.card-state {
+  width: 100%;
+  margin-top: 12px;
+  padding: 5px;
+  border: 1px solid var(--strong-line);
+  border-radius: 5px;
+  color: var(--text);
+  background: var(--surface);
+  font-size: 12px;
+}
+.file-open {
+  display: grid;
+  gap: 5px;
+  background: transparent;
+  color: var(--text);
+  border: 0;
+  padding: 0;
+  text-align: left;
+  max-width: 230px;
+  overflow-wrap: anywhere;
+}
+.actual-image {
+  display: block;
+  max-width: 100%;
+  max-height: 65vh;
+  object-fit: contain;
+  margin: auto;
+}
+.overflow-menu {
+  position: relative;
+}
+.overflow-menu summary {
+  list-style: none;
+  cursor: pointer;
+}
+.overflow-menu summary::-webkit-details-marker {
+  display: none;
+}
+.menu-popover {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  z-index: 15;
+  min-width: 180px;
+  padding: 6px;
+  background: var(--raised);
+  border: 1px solid var(--strong-line);
+  border-radius: 7px;
+  box-shadow: var(--shadow);
+}
+.menu-popover .btn {
+  justify-content: flex-start;
+}
+.wrap {
+  overflow-wrap: anywhere;
+}
+.field select[multiple] {
+  min-height: 80px;
+}
+.work-card a.item-title {
+  color: var(--text);
+}
+.table-wrap > .panel {
+  border: 0;
+}
+.form-error + .detail-grid,
+.form-error + .section {
+  margin-top: 20px;
+}
+.dependency-banner p {
+  margin-bottom: 0;
+}
+.activity-row summary {
+  cursor: pointer;
+  margin-top: 7px;
+}
+.modal .field input[readonly] {
+  background: var(--bg);
+}
+@media (max-width: 760px) {
+  .sidebar {
+    position: static;
+  }
+  .app.menu-open .sidebar {
+    position: fixed;
+    height: 100dvh;
+  }
+  .header {
+    z-index: 10;
+  }
+  .modal {
+    max-width: calc(100vw - 24px);
+    max-height: calc(100dvh - 24px);
+  }
+  .detail-side {
+    grid-template-columns: 1fr 1fr;
+  }
+  .candidate-list {
+    max-height: 40vh;
+  }
+  .page > .form-error {
+    margin-bottom: 20px;
+  }
+  .modal-footer .btn {
+    min-height: 44px;
+  }
+  .person {
+    white-space: normal;
+  }
+  .text-preview {
+    max-width: 100%;
+  }
+}
+@media (max-width: 380px) {
+  .detail-side {
+    grid-template-columns: 1fr;
+  }
+  .mode-grid {
+    grid-template-columns: 1fr;
+  }
+  .mini-window {
+    height: 50px;
+  }
+}
+
+dialog.drawer {
+  margin: 0 0 0 auto;
+  height: 100dvh;
+  max-height: 100dvh;
+  max-width: 100vw;
+  width: min(460px, 100vw);
+  border-radius: 0;
+}
+
+[hidden] {
+  display: none !important;
+}
+.modal .auth-page {
+  min-height: auto;
+  padding: 16px 0 0;
+}
+.modal .auth-card {
+  width: 100%;
+}
+progress {
+  accent-color: var(--accent);
+  width: 100%;
+}
+
+.planning-layout > *,
+.stack,
+.sprint-section {
+  min-width: 0;
+}
+.table {
+  min-width: 760px;
+}
+.table .person {
+  min-width: 130px;
+}
+.table .person > span:not(.avatar) {
+  overflow-wrap: normal;
+}
+.table .row {
+  flex-wrap: nowrap;
+}
+.sprint-head {
+  flex-wrap: wrap;
+}
+.sprint-section-head {
+  flex-wrap: wrap;
+}
+.stack {
+  grid-template-columns: minmax(0, 1fr);
+}
+.stack > * {
+  min-width: 0;
+}
+h1[tabindex="-1"]:focus {
+  outline: none;
+}

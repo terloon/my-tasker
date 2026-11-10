@@ -1,0 +1,21 @@
+services:
+  app:
+    build: .
+    image: local-planner:local
+    ports:
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - planner-data:/data
+    environment:
+      PLANNER_ALLOWED_HOSTS: localhost,127.0.0.1,app
+      PLANNER_ALLOWED_ORIGINS: http://localhost:8080,http://127.0.0.1:8080
+    restart: unless-stopped
+    networks:
+      - planner
+
+volumes:
+  planner-data:
+
+networks:
+  planner:
+    name: local-planner

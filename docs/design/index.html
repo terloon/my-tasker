@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Local Planner · Screen review</title>
+  <link rel="stylesheet" href="assets/design.css">
+  <script src="assets/catalogue.js" defer></script>
+  <script src="assets/gallery.js" defer></script>
+</head>
+<body>
+  <div class="gallery">
+    <aside class="gallery-sidebar">
+      <h1>Local Planner</h1>
+      <p>35 screen designs · Review draft v2</p>
+      <nav id="screen-nav" aria-label="Screen inventory"></nav>
+    </aside>
+    <main class="gallery-main">
+      <header class="gallery-toolbar">
+        <div class="row"><button class="btn small" id="previous" aria-label="Previous screen">←</button><button class="btn small" id="next" aria-label="Next screen">→</button><h2 id="screen-title">Screen review</h2><span class="review-status" id="screen-surface">Page</span></div>
+        <div class="row">
+          <label class="small">Mode <select id="theme" aria-label="Preview appearance"><option value="light">Light</option><option value="dark">Dark</option><option value="system">System</option></select></label>
+          <label class="small">Accent <select id="accent" aria-label="Preview accent"></select></label>
+          <label class="small">Width <select id="width" aria-label="Preview viewport width"><option value="fluid">Fit window</option><option value="1440">Desktop · 1440</option><option value="1100">Laptop · 1100</option><option value="834">Tablet · 834</option><option value="390">Mobile · 390</option></select></label>
+        </div>
+      </header>
+      <div class="gallery-note"><label>State <select id="state" aria-label="Preview state"></select></label><span id="screen-progress"></span><a id="notes-link" href="README.md" target="_blank" rel="noopener">Design notes ↗</a><a id="standalone-link" href="03-home/index.html" target="_blank" rel="noopener">Open screen ↗</a><span class="grow"></span><span>Fictional data · Nothing is saved</span></div>
+      <div class="gallery-stage" id="stage"><iframe id="screen-frame" title="Screen design preview" src="03-home/index.html?embed=1"></iframe></div>
+    </main>
+  </div>
+</body>
+</html>

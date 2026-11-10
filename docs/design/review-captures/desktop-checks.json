@@ -1,0 +1,226 @@
+[
+  {
+    "id": "01-setup",
+    "bodyWidth": 1280,
+    "dialog": false,
+    "title": "Create your administrator",
+    "viewport": 1280
+  },
+  {
+    "id": "02-login",
+    "bodyWidth": 1280,
+    "dialog": false,
+    "title": "Welcome back",
+    "viewport": 1280
+  },
+  {
+    "id": "03-home",
+    "bodyWidth": 1280,
+    "dialog": false,
+    "title": "Home",
+    "viewport": 1280
+  },
+  {
+    "id": "04-project-overview",
+    "bodyWidth": 1280,
+    "dialog": false,
+    "title": "Local Planner",
+    "viewport": 1280
+  },
+  {
+    "id": "05-planning",
+    "bodyWidth": 1280,
+    "dialog": false,
+    "title": "Planning",
+    "viewport": 1280
+  },
+  {
+    "id": "06-item-list",
+    "bodyWidth": 1280,
+    "dialog": false,
+    "title": "Items",
+    "viewport": 1280
+  },
+  {
+    "id": "07-sprint-board",
+    "bodyWidth": 1280,
+    "dialog": false,
+    "title": "Sprint 1 · Core workflow",
+    "viewport": 1280
+  },
+  {
+    "id": "08-item-detail",
+    "bodyWidth": 1280,
+    "dialog": false,
+    "title": "Build the sprint board",
+    "viewport": 1280
+  },
+  {
+    "id": "09-users",
+    "bodyWidth": 1280,
+    "dialog": false,
+    "title": "Users",
+    "viewport": 1280
+  },
+  {
+    "id": "10-project-permissions",
+    "bodyWidth": 1280,
+    "dialog": false,
+    "title": "Project permissions",
+    "viewport": 1280
+  },
+  {
+    "id": "11-appearance",
+    "bodyWidth": 1280,
+    "dialog": false,
+    "title": "Appearance",
+    "viewport": 1280
+  },
+  {
+    "id": "12-account-security",
+    "bodyWidth": 1280,
+    "dialog": false,
+    "title": "Account",
+    "viewport": 1280
+  },
+  {
+    "id": "13-project-editor",
+    "bodyWidth": 1280,
+    "dialog": true,
+    "title": "Create project",
+    "viewport": 1280
+  },
+  {
+    "id": "14-sprint-editor",
+    "bodyWidth": 1280,
+    "dialog": true,
+    "title": "Create sprint",
+    "viewport": 1280
+  },
+  {
+    "id": "15-sprint-start",
+    "bodyWidth": 1280,
+    "dialog": true,
+    "title": "Start sprint",
+    "viewport": 1280
+  },
+  {
+    "id": "16-sprint-close",
+    "bodyWidth": 1280,
+    "dialog": true,
+    "title": "Close sprint",
+    "viewport": 1280
+  },
+  {
+    "id": "17-item-create",
+    "bodyWidth": 1280,
+    "dialog": true,
+    "title": "Create item",
+    "viewport": 1280
+  },
+  {
+    "id": "18-item-move",
+    "bodyWidth": 1280,
+    "dialog": true,
+    "title": "Move items",
+    "viewport": 1280
+  },
+  {
+    "id": "19-item-link",
+    "bodyWidth": 1280,
+    "dialog": true,
+    "title": "Link item",
+    "viewport": 1280
+  },
+  {
+    "id": "20-label-manager",
+    "bodyWidth": 1280,
+    "dialog": true,
+    "title": "Project labels",
+    "viewport": 1280
+  },
+  {
+    "id": "21-attachment-preview",
+    "bodyWidth": 1280,
+    "dialog": true,
+    "title": "board-reference.png",
+    "viewport": 1280
+  },
+  {
+    "id": "22-user-editor",
+    "bodyWidth": 1280,
+    "dialog": true,
+    "title": "Create user",
+    "viewport": 1280
+  },
+  {
+    "id": "23-user-detail",
+    "bodyWidth": 1280,
+    "dialog": true,
+    "title": "Calm Otter",
+    "viewport": 1280
+  },
+  {
+    "id": "24-agent-credentials",
+    "bodyWidth": 1280,
+    "dialog": true,
+    "title": "Agent created",
+    "viewport": 1280
+  },
+  {
+    "id": "25-password-editor",
+    "bodyWidth": 1280,
+    "dialog": true,
+    "title": "Change password",
+    "viewport": 1280
+  },
+  {
+    "id": "26-delete-confirmation",
+    "bodyWidth": 1280,
+    "dialog": true,
+    "title": "Delete item",
+    "viewport": 1280
+  },
+  {
+    "id": "27-edit-conflict",
+    "bodyWidth": 1280,
+    "dialog": true,
+    "title": "This changed while you were editing",
+    "viewport": 1280
+  },
+  {
+    "id": "28-access-denied",
+    "bodyWidth": 1280,
+    "dialog": false,
+    "title": "You do not have access to this page",
+    "viewport": 1280
+  },
+  {
+    "id": "29-not-found",
+    "bodyWidth": 1280,
+    "dialog": false,
+    "title": "Page not found",
+    "viewport": 1280
+  },
+  {
+    "id": "30-service-unavailable",
+    "bodyWidth": 1280,
+    "dialog": false,
+    "title": "Local Planner",
+    "viewport": 1280
+  },
+  {
+    "id": "31-session-expired",
+    "bodyWidth": 1280,
+    "dialog": true,
+    "title": "Your session has expired",
+    "viewport": 1280
+  },
+  {
+    "id": "32-unsaved-changes",
+    "bodyWidth": 1280,
+    "dialog": true,
+    "title": "Leave without saving?",
+    "viewport": 1280
+  }
+]

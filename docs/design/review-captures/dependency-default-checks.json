@@ -1,0 +1,492 @@
+[
+  {
+    "id": "01-setup",
+    "theme": "light",
+    "scrollWidth": 1280,
+    "title": "Create your administrator",
+    "width": 1280
+  },
+  {
+    "id": "01-setup",
+    "theme": "dark",
+    "scrollWidth": 1280,
+    "title": "Create your administrator",
+    "width": 1280
+  },
+  {
+    "id": "02-login",
+    "theme": "light",
+    "scrollWidth": 1280,
+    "title": "Welcome back",
+    "width": 1280
+  },
+  {
+    "id": "02-login",
+    "theme": "dark",
+    "scrollWidth": 1280,
+    "title": "Welcome back",
+    "width": 1280
+  },
+  {
+    "id": "03-home",
+    "theme": "light",
+    "scrollWidth": 1280,
+    "title": "Home",
+    "width": 1280
+  },
+  {
+    "id": "03-home",
+    "theme": "dark",
+    "scrollWidth": 1280,
+    "title": "Home",
+    "width": 1280
+  },
+  {
+    "id": "04-project-overview",
+    "theme": "light",
+    "scrollWidth": 1280,
+    "title": "Local Planner",
+    "width": 1280
+  },
+  {
+    "id": "04-project-overview",
+    "theme": "dark",
+    "scrollWidth": 1280,
+    "title": "Local Planner",
+    "width": 1280
+  },
+  {
+    "id": "05-planning",
+    "theme": "light",
+    "scrollWidth": 1280,
+    "title": "Planning",
+    "width": 1280
+  },
+  {
+    "id": "05-planning",
+    "theme": "dark",
+    "scrollWidth": 1280,
+    "title": "Planning",
+    "width": 1280
+  },
+  {
+    "id": "06-item-list",
+    "theme": "light",
+    "scrollWidth": 1280,
+    "title": "Items",
+    "width": 1280
+  },
+  {
+    "id": "06-item-list",
+    "theme": "dark",
+    "scrollWidth": 1280,
+    "title": "Items",
+    "width": 1280
+  },
+  {
+    "id": "07-sprint-board",
+    "theme": "light",
+    "scrollWidth": 1280,
+    "title": "Sprint 1 · Core workflow",
+    "width": 1280
+  },
+  {
+    "id": "07-sprint-board",
+    "theme": "dark",
+    "scrollWidth": 1280,
+    "title": "Sprint 1 · Core workflow",
+    "width": 1280
+  },
+  {
+    "id": "08-item-detail",
+    "theme": "light",
+    "scrollWidth": 1280,
+    "title": "Build the sprint board",
+    "width": 1280
+  },
+  {
+    "id": "08-item-detail",
+    "theme": "dark",
+    "scrollWidth": 1280,
+    "title": "Build the sprint board",
+    "width": 1280
+  },
+  {
+    "id": "09-users",
+    "theme": "light",
+    "scrollWidth": 1280,
+    "title": "Users",
+    "width": 1280
+  },
+  {
+    "id": "09-users",
+    "theme": "dark",
+    "scrollWidth": 1280,
+    "title": "Users",
+    "width": 1280
+  },
+  {
+    "id": "10-project-permissions",
+    "theme": "light",
+    "scrollWidth": 1280,
+    "title": "Project permissions",
+    "width": 1280
+  },
+  {
+    "id": "10-project-permissions",
+    "theme": "dark",
+    "scrollWidth": 1280,
+    "title": "Project permissions",
+    "width": 1280
+  },
+  {
+    "id": "11-appearance",
+    "theme": "light",
+    "scrollWidth": 1280,
+    "title": "Appearance",
+    "width": 1280
+  },
+  {
+    "id": "11-appearance",
+    "theme": "dark",
+    "scrollWidth": 1280,
+    "title": "Appearance",
+    "width": 1280
+  },
+  {
+    "id": "12-account-security",
+    "theme": "light",
+    "scrollWidth": 1280,
+    "title": "Account",
+    "width": 1280
+  },
+  {
+    "id": "12-account-security",
+    "theme": "dark",
+    "scrollWidth": 1280,
+    "title": "Account",
+    "width": 1280
+  },
+  {
+    "id": "13-project-editor",
+    "theme": "light",
+    "scrollWidth": 1280,
+    "title": "Create project",
+    "width": 1280
+  },
+  {
+    "id": "13-project-editor",
+    "theme": "dark",
+    "scrollWidth": 1280,
+    "title": "Create project",
+    "width": 1280
+  },
+  {
+    "id": "14-sprint-editor",
+    "theme": "light",
+    "scrollWidth": 1280,
+    "title": "Create sprint",
+    "width": 1280
+  },
+  {
+    "id": "14-sprint-editor",
+    "theme": "dark",
+    "scrollWidth": 1280,
+    "title": "Create sprint",
+    "width": 1280
+  },
+  {
+    "id": "15-sprint-start",
+    "theme": "light",
+    "scrollWidth": 1280,
+    "title": "Start sprint",
+    "width": 1280
+  },
+  {
+    "id": "15-sprint-start",
+    "theme": "dark",
+    "scrollWidth": 1280,
+    "title": "Start sprint",
+    "width": 1280
+  },
+  {
+    "id": "16-sprint-close",
+    "theme": "light",
+    "scrollWidth": 1280,
+    "title": "Close sprint",
+    "width": 1280
+  },
+  {
+    "id": "16-sprint-close",
+    "theme": "dark",
+    "scrollWidth": 1280,
+    "title": "Close sprint",
+    "width": 1280
+  },
+  {
+    "id": "17-item-create",
+    "theme": "light",
+    "scrollWidth": 1280,
+    "title": "Create item",
+    "width": 1280
+  },
+  {
+    "id": "17-item-create",
+    "theme": "dark",
+    "scrollWidth": 1280,
+    "title": "Create item",
+    "width": 1280
+  },
+  {
+    "id": "18-item-move",
+    "theme": "light",
+    "scrollWidth": 1280,
+    "title": "Move items",
+    "width": 1280
+  },
+  {
+    "id": "18-item-move",
+    "theme": "dark",
+    "scrollWidth": 1280,
+    "title": "Move items",
+    "width": 1280
+  },
+  {
+    "id": "19-item-link",
+    "theme": "light",
+    "scrollWidth": 1280,
+    "title": "Link item",
+    "width": 1280
+  },
+  {
+    "id": "19-item-link",
+    "theme": "dark",
+    "scrollWidth": 1280,
+    "title": "Link item",
+    "width": 1280
+  },
+  {
+    "id": "20-label-manager",
+    "theme": "light",
+    "scrollWidth": 1280,
+    "title": "Project labels",
+    "width": 1280
+  },
+  {
+    "id": "20-label-manager",
+    "theme": "dark",
+    "scrollWidth": 1280,
+    "title": "Project labels",
+    "width": 1280
+  },
+  {
+    "id": "21-attachment-preview",
+    "theme": "light",
+    "scrollWidth": 1280,
+    "title": "board-reference.png",
+    "width": 1280
+  },
+  {
+    "id": "21-attachment-preview",
+    "theme": "dark",
+    "scrollWidth": 1280,
+    "title": "board-reference.png",
+    "width": 1280
+  },
+  {
+    "id": "22-user-editor",
+    "theme": "light",
+    "scrollWidth": 1280,
+    "title": "Create user",
+    "width": 1280
+  },
+  {
+    "id": "22-user-editor",
+    "theme": "dark",
+    "scrollWidth": 1280,
+    "title": "Create user",
+    "width": 1280
+  },
+  {
+    "id": "23-user-detail",
+    "theme": "light",
+    "scrollWidth": 1280,
+    "title": "Calm Otter",
+    "width": 1280
+  },
+  {
+    "id": "23-user-detail",
+    "theme": "dark",
+    "scrollWidth": 1280,
+    "title": "Calm Otter",
+    "width": 1280
+  },
+  {
+    "id": "24-agent-credentials",
+    "theme": "light",
+    "scrollWidth": 1280,
+    "title": "Agent created",
+    "width": 1280
+  },
+  {
+    "id": "24-agent-credentials",
+    "theme": "dark",
+    "scrollWidth": 1280,
+    "title": "Agent created",
+    "width": 1280
+  },
+  {
+    "id": "25-password-editor",
+    "theme": "light",
+    "scrollWidth": 1280,
+    "title": "Change password",
+    "width": 1280
+  },
+  {
+    "id": "25-password-editor",
+    "theme": "dark",
+    "scrollWidth": 1280,
+    "title": "Change password",
+    "width": 1280
+  },
+  {
+    "id": "26-delete-confirmation",
+    "theme": "light",
+    "scrollWidth": 1280,
+    "title": "Delete item",
+    "width": 1280
+  },
+  {
+    "id": "26-delete-confirmation",
+    "theme": "dark",
+    "scrollWidth": 1280,
+    "title": "Delete item",
+    "width": 1280
+  },
+  {
+    "id": "27-edit-conflict",
+    "theme": "light",
+    "scrollWidth": 1280,
+    "title": "This changed while you were editing",
+    "width": 1280
+  },
+  {
+    "id": "27-edit-conflict",
+    "theme": "dark",
+    "scrollWidth": 1280,
+    "title": "This changed while you were editing",
+    "width": 1280
+  },
+  {
+    "id": "28-access-denied",
+    "theme": "light",
+    "scrollWidth": 1280,
+    "title": "You do not have access to this page",
+    "width": 1280
+  },
+  {
+    "id": "28-access-denied",
+    "theme": "dark",
+    "scrollWidth": 1280,
+    "title": "You do not have access to this page",
+    "width": 1280
+  },
+  {
+    "id": "29-not-found",
+    "theme": "light",
+    "scrollWidth": 1280,
+    "title": "Page not found",
+    "width": 1280
+  },
+  {
+    "id": "29-not-found",
+    "theme": "dark",
+    "scrollWidth": 1280,
+    "title": "Page not found",
+    "width": 1280
+  },
+  {
+    "id": "30-service-unavailable",
+    "theme": "light",
+    "scrollWidth": 1280,
+    "title": "Local Planner",
+    "width": 1280
+  },
+  {
+    "id": "30-service-unavailable",
+    "theme": "dark",
+    "scrollWidth": 1280,
+    "title": "Local Planner",
+    "width": 1280
+  },
+  {
+    "id": "31-session-expired",
+    "theme": "light",
+    "scrollWidth": 1280,
+    "title": "Your session has expired",
+    "width": 1280
+  },
+  {
+    "id": "31-session-expired",
+    "theme": "dark",
+    "scrollWidth": 1280,
+    "title": "Your session has expired",
+    "width": 1280
+  },
+  {
+    "id": "32-unsaved-changes",
+    "theme": "light",
+    "scrollWidth": 1280,
+    "title": "Leave without saving?",
+    "width": 1280
+  },
+  {
+    "id": "32-unsaved-changes",
+    "theme": "dark",
+    "scrollWidth": 1280,
+    "title": "Leave without saving?",
+    "width": 1280
+  },
+  {
+    "id": "33-block-item",
+    "theme": "light",
+    "scrollWidth": 1280,
+    "title": "Move item to Blocked",
+    "width": 1280
+  },
+  {
+    "id": "33-block-item",
+    "theme": "dark",
+    "scrollWidth": 1280,
+    "title": "Move item to Blocked",
+    "width": 1280
+  },
+  {
+    "id": "34-blockers-resolved",
+    "theme": "light",
+    "scrollWidth": 1280,
+    "title": "All blockers are Done",
+    "width": 1280
+  },
+  {
+    "id": "34-blockers-resolved",
+    "theme": "dark",
+    "scrollWidth": 1280,
+    "title": "All blockers are Done",
+    "width": 1280
+  },
+  {
+    "id": "35-cancel-blocker",
+    "theme": "light",
+    "scrollWidth": 1280,
+    "title": "Cancel item and remove blocker links?",
+    "width": 1280
+  },
+  {
+    "id": "35-cancel-blocker",
+    "theme": "dark",
+    "scrollWidth": 1280,
+    "title": "Cancel item and remove blocker links?",
+    "width": 1280
+  }
+]

@@ -1,0 +1,810 @@
+[
+  {
+    "id": "01-setup",
+    "state": "validation",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Create your administrator",
+    "viewport": 1280
+  },
+  {
+    "id": "01-setup",
+    "state": "submitting",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Create your administrator",
+    "viewport": 1280
+  },
+  {
+    "id": "01-setup",
+    "state": "already-initialized",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Setup is already complete",
+    "viewport": 1280
+  },
+  {
+    "id": "02-login",
+    "state": "validation",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Welcome back",
+    "viewport": 1280
+  },
+  {
+    "id": "02-login",
+    "state": "submitting",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Welcome back",
+    "viewport": 1280
+  },
+  {
+    "id": "03-home",
+    "state": "empty",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Home",
+    "viewport": 1280
+  },
+  {
+    "id": "03-home",
+    "state": "no-access",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Home",
+    "viewport": 1280
+  },
+  {
+    "id": "03-home",
+    "state": "loading",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Home",
+    "viewport": 1280
+  },
+  {
+    "id": "03-home",
+    "state": "read-only",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Home",
+    "viewport": 1280
+  },
+  {
+    "id": "04-project-overview",
+    "state": "activity",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Local Planner",
+    "viewport": 1280
+  },
+  {
+    "id": "04-project-overview",
+    "state": "empty",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Local Planner",
+    "viewport": 1280
+  },
+  {
+    "id": "04-project-overview",
+    "state": "loading",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Project overview",
+    "viewport": 1280
+  },
+  {
+    "id": "04-project-overview",
+    "state": "read-only",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Local Planner",
+    "viewport": 1280
+  },
+  {
+    "id": "05-planning",
+    "state": "selected",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Planning",
+    "viewport": 1280
+  },
+  {
+    "id": "05-planning",
+    "state": "empty",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Planning",
+    "viewport": 1280
+  },
+  {
+    "id": "05-planning",
+    "state": "loading",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Planning",
+    "viewport": 1280
+  },
+  {
+    "id": "05-planning",
+    "state": "read-only",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Planning",
+    "viewport": 1280
+  },
+  {
+    "id": "06-item-list",
+    "state": "filters",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Items",
+    "viewport": 1280
+  },
+  {
+    "id": "06-item-list",
+    "state": "empty",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Items",
+    "viewport": 1280
+  },
+  {
+    "id": "06-item-list",
+    "state": "loading",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Item list and query",
+    "viewport": 1280
+  },
+  {
+    "id": "06-item-list",
+    "state": "read-only",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Items",
+    "viewport": 1280
+  },
+  {
+    "id": "07-sprint-board",
+    "state": "planned",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Sprint 2 · Collaboration",
+    "viewport": 1280
+  },
+  {
+    "id": "07-sprint-board",
+    "state": "closed",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Sprint 1 · Core workflow",
+    "viewport": 1280
+  },
+  {
+    "id": "07-sprint-board",
+    "state": "empty",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Sprint 1 · Core workflow",
+    "viewport": 1280
+  },
+  {
+    "id": "07-sprint-board",
+    "state": "loading",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Sprint board",
+    "viewport": 1280
+  },
+  {
+    "id": "07-sprint-board",
+    "state": "read-only",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Sprint 1 · Core workflow",
+    "viewport": 1280
+  },
+  {
+    "id": "08-item-detail",
+    "state": "editing",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Build the sprint board",
+    "viewport": 1280
+  },
+  {
+    "id": "08-item-detail",
+    "state": "activity",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Build the sprint board",
+    "viewport": 1280
+  },
+  {
+    "id": "08-item-detail",
+    "state": "uploading",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Build the sprint board",
+    "viewport": 1280
+  },
+  {
+    "id": "08-item-detail",
+    "state": "closed-sprint",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Build the sprint board",
+    "viewport": 1280
+  },
+  {
+    "id": "08-item-detail",
+    "state": "read-only",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Build the sprint board",
+    "viewport": 1280
+  },
+  {
+    "id": "08-item-detail",
+    "state": "loading",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Item detail",
+    "viewport": 1280
+  },
+  {
+    "id": "09-users",
+    "state": "filtered",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Users",
+    "viewport": 1280
+  },
+  {
+    "id": "09-users",
+    "state": "loading",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "User administration",
+    "viewport": 1280
+  },
+  {
+    "id": "09-users",
+    "state": "empty",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Users",
+    "viewport": 1280
+  },
+  {
+    "id": "10-project-permissions",
+    "state": "no-grants",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Project permissions",
+    "viewport": 1280
+  },
+  {
+    "id": "10-project-permissions",
+    "state": "dirty",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Project permissions",
+    "viewport": 1280
+  },
+  {
+    "id": "10-project-permissions",
+    "state": "admin-user",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Project permissions",
+    "viewport": 1280
+  },
+  {
+    "id": "10-project-permissions",
+    "state": "loading",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Project permissions",
+    "viewport": 1280
+  },
+  {
+    "id": "10-project-permissions",
+    "state": "conflict",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Project permissions",
+    "viewport": 1280
+  },
+  {
+    "id": "11-appearance",
+    "state": "dark",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Appearance",
+    "viewport": 1280
+  },
+  {
+    "id": "11-appearance",
+    "state": "system",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Appearance",
+    "viewport": 1280
+  },
+  {
+    "id": "11-appearance",
+    "state": "saving",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Appearance",
+    "viewport": 1280
+  },
+  {
+    "id": "11-appearance",
+    "state": "error",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Appearance",
+    "viewport": 1280
+  },
+  {
+    "id": "12-account-security",
+    "state": "loading",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Account and password",
+    "viewport": 1280
+  },
+  {
+    "id": "13-project-editor",
+    "state": "edit",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Edit project",
+    "viewport": 1280
+  },
+  {
+    "id": "13-project-editor",
+    "state": "validation",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Create project",
+    "viewport": 1280
+  },
+  {
+    "id": "13-project-editor",
+    "state": "submitting",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Create project",
+    "viewport": 1280
+  },
+  {
+    "id": "14-sprint-editor",
+    "state": "rename",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Rename sprint",
+    "viewport": 1280
+  },
+  {
+    "id": "14-sprint-editor",
+    "state": "validation",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Create sprint",
+    "viewport": 1280
+  },
+  {
+    "id": "14-sprint-editor",
+    "state": "submitting",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Create sprint",
+    "viewport": 1280
+  },
+  {
+    "id": "15-sprint-start",
+    "state": "another-active",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Start sprint",
+    "viewport": 1280
+  },
+  {
+    "id": "15-sprint-start",
+    "state": "submitting",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Start sprint",
+    "viewport": 1280
+  },
+  {
+    "id": "16-sprint-close",
+    "state": "ready",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Close sprint",
+    "viewport": 1280
+  },
+  {
+    "id": "16-sprint-close",
+    "state": "no-destination",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Close sprint",
+    "viewport": 1280
+  },
+  {
+    "id": "16-sprint-close",
+    "state": "submitting",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Close sprint",
+    "viewport": 1280
+  },
+  {
+    "id": "16-sprint-close",
+    "state": "conflict",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Close sprint",
+    "viewport": 1280
+  },
+  {
+    "id": "17-item-create",
+    "state": "backlog",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Create item",
+    "viewport": 1280
+  },
+  {
+    "id": "17-item-create",
+    "state": "validation",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Create item",
+    "viewport": 1280
+  },
+  {
+    "id": "17-item-create",
+    "state": "submitting",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Create item",
+    "viewport": 1280
+  },
+  {
+    "id": "18-item-move",
+    "state": "single",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Move item",
+    "viewport": 1280
+  },
+  {
+    "id": "18-item-move",
+    "state": "reopen",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Move and reopen item",
+    "viewport": 1280
+  },
+  {
+    "id": "18-item-move",
+    "state": "validation",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Move items",
+    "viewport": 1280
+  },
+  {
+    "id": "18-item-move",
+    "state": "submitting",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Move items",
+    "viewport": 1280
+  },
+  {
+    "id": "19-item-link",
+    "state": "parent",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Link item",
+    "viewport": 1280
+  },
+  {
+    "id": "19-item-link",
+    "state": "no-results",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Link item",
+    "viewport": 1280
+  },
+  {
+    "id": "19-item-link",
+    "state": "validation",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Link item",
+    "viewport": 1280
+  },
+  {
+    "id": "20-label-manager",
+    "state": "empty",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Project labels",
+    "viewport": 1280
+  },
+  {
+    "id": "20-label-manager",
+    "state": "validation",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Project labels",
+    "viewport": 1280
+  },
+  {
+    "id": "20-label-manager",
+    "state": "read-only",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Project labels",
+    "viewport": 1280
+  },
+  {
+    "id": "21-attachment-preview",
+    "state": "text",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "acceptance-notes.md",
+    "viewport": 1280
+  },
+  {
+    "id": "21-attachment-preview",
+    "state": "unsupported",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "project-export.zip",
+    "viewport": 1280
+  },
+  {
+    "id": "21-attachment-preview",
+    "state": "loading",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "board-reference.png",
+    "viewport": 1280
+  },
+  {
+    "id": "21-attachment-preview",
+    "state": "error",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "board-reference.png",
+    "viewport": 1280
+  },
+  {
+    "id": "22-user-editor",
+    "state": "agent",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Create user",
+    "viewport": 1280
+  },
+  {
+    "id": "22-user-editor",
+    "state": "edit",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Edit user",
+    "viewport": 1280
+  },
+  {
+    "id": "22-user-editor",
+    "state": "validation",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Create user",
+    "viewport": 1280
+  },
+  {
+    "id": "22-user-editor",
+    "state": "submitting",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Create user",
+    "viewport": 1280
+  },
+  {
+    "id": "23-user-detail",
+    "state": "human",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Taylor Ramos",
+    "viewport": 1280
+  },
+  {
+    "id": "23-user-detail",
+    "state": "disabled",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Calm Otter",
+    "viewport": 1280
+  },
+  {
+    "id": "23-user-detail",
+    "state": "last-admin",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Taylor Ramos",
+    "viewport": 1280
+  },
+  {
+    "id": "24-agent-credentials",
+    "state": "rotated",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Agent password rotated",
+    "viewport": 1280
+  },
+  {
+    "id": "24-agent-credentials",
+    "state": "copied",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Agent created",
+    "viewport": 1280
+  },
+  {
+    "id": "25-password-editor",
+    "state": "admin-reset",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Reset human password",
+    "viewport": 1280
+  },
+  {
+    "id": "25-password-editor",
+    "state": "validation",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Change password",
+    "viewport": 1280
+  },
+  {
+    "id": "25-password-editor",
+    "state": "submitting",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Change password",
+    "viewport": 1280
+  },
+  {
+    "id": "26-delete-confirmation",
+    "state": "sprint",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Delete sprint",
+    "viewport": 1280
+  },
+  {
+    "id": "26-delete-confirmation",
+    "state": "project",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Delete project",
+    "viewport": 1280
+  },
+  {
+    "id": "26-delete-confirmation",
+    "state": "comment",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Delete comment",
+    "viewport": 1280
+  },
+  {
+    "id": "26-delete-confirmation",
+    "state": "attachment",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Delete attachment",
+    "viewport": 1280
+  },
+  {
+    "id": "26-delete-confirmation",
+    "state": "label",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Delete label",
+    "viewport": 1280
+  },
+  {
+    "id": "26-delete-confirmation",
+    "state": "disable-user",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Disable account",
+    "viewport": 1280
+  },
+  {
+    "id": "26-delete-confirmation",
+    "state": "rotate-agent",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Rotate password",
+    "viewport": 1280
+  },
+  {
+    "id": "26-delete-confirmation",
+    "state": "blocked",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "This action is unavailable",
+    "viewport": 1280
+  },
+  {
+    "id": "27-edit-conflict",
+    "state": "permissions",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "This changed while you were editing",
+    "viewport": 1280
+  },
+  {
+    "id": "27-edit-conflict",
+    "state": "deleted",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "This item is no longer available",
+    "viewport": 1280
+  },
+  {
+    "id": "29-not-found",
+    "state": "deleted",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "This item was deleted",
+    "viewport": 1280
+  },
+  {
+    "id": "30-service-unavailable",
+    "state": "busy",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Local Planner",
+    "viewport": 1280
+  },
+  {
+    "id": "30-service-unavailable",
+    "state": "cached",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Local Planner",
+    "viewport": 1280
+  },
+  {
+    "id": "31-session-expired",
+    "state": "with-draft",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Your session has expired",
+    "viewport": 1280
+  },
+  {
+    "id": "32-unsaved-changes",
+    "state": "permissions",
+    "bodyWidth": 1280,
+    "rendered": true,
+    "title": "Leave without saving?",
+    "viewport": 1280
+  }
+]
