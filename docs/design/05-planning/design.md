@@ -1,6 +1,6 @@
 # Planning
 
-Design baseline: v2, November 9, 2026. **Approved for implementation by the user, November 9, 2026.**
+Design baseline: v3, November 9, 2026; updated for the user-requested sprint-first planning workflow. **Approved for implementation by the user, November 9, 2026.**
 
 [Open preview](index.html) · [Review in gallery](../index.html#05-planning) · [Shared design guide](../design_guide.md) · [All screens](../README.md)
 
@@ -12,7 +12,7 @@ Surface: **Page**. Route or entry: `/projects/:id/planning`.
 
 ## Layout to preserve
 
-Backlog panel at left; ordered sprint sections at right. Each sprint has lifecycle, counts, and contextual actions. Bulk selection exposes a slim move bar.
+Initial sprint catalog only. Selected sprint: ordered items at top, filterable Backlog below. Drag Backlog into the sprint and reorder sprint rows; buttons provide keyboard equivalents.
 
 Use the shared application shell, typography, spacing, colors and component rules. This screen does not establish its own palette or navigation model. The HTML preview is a visual baseline; the rules in this document define the complete behavior beyond the demonstrative interactions.
 
@@ -22,6 +22,9 @@ Use the shared application shell, typography, spacing, colors and component rule
 - Reorder sprints
 - Move selected items
 - Start sprint
+- Flag an open item with a question or return a flagged item to Open directly from its row.
+- Use the Open questions count above the sprint items to filter the list. In Backlog, choose Open question in the State filter.
+- A planned sprint with open questions shows the blocking count and disables Start sprint until the flagged items are returned to Open.
 - Close sprint
 - Create item
 
@@ -91,3 +94,21 @@ Status: Ready for review.
 Decisions: the layout above is the proposed v1 baseline. Explicit user review is required before labeling this screen Approved; that label is a review record and does not block creating or refining previews.
 
 Revision notes: Dependency workflow added November 9, 2026, including required blocker links, repeated ready prompt, cancellation impact and last-link removal -> Open.
+
+## Sprint planning redesign
+
+Sprint descriptions are optional, support safe Markdown, and are editable after creation. Migration gives existing sprints an empty description while preserving names, contents, lifecycle and versions. Planning opens on all sprints; selected planning uses `?sprint=<id>`, with sprint items above a filtered Backlog. New items append; sprint rows can be dragged before another row or to the end. Reordering submits the complete membership and version snapshot. Search, type, state, priority, assignee and label filters apply only to Backlog. Buttons offer add, move and up/down equivalents. Sprint Overview and Board are selected using `?view=overview|board`; the default is Overview.
+
+## Backlog ordering
+
+Backlog has a persistent project-wide manual order, independent of the selected sprint's lifecycle. Users with item update permission can drag a Backlog row before another Backlog row, drop at the end of the full Backlog, use up/down arrows, or promote an item with Move to top (⇈). The ordering controls remain available while viewing a closed sprint; adding items into that sprint remains unavailable.
+
+With filters applied, drag and up/down move between matching items while preserving hidden items' relative order. Move to top and the end drop area refer to the entire Backlog, including hidden items and other pages. Up/down works across page boundaries. Reorders validate the full unfiltered membership and versions, preserve item state/type/priority, record history, and refetch on conflict. Read-only users see the saved order without mutation controls.
+
+## Sprint lifecycle separation
+
+The catalog defaults to **Not started**, with separate **Active** and **Closed** tabs and counts. `?sprint_state=active|closed` selects a nondefault view. There is no mixed default list. Empty states are specific to each category. Selected sprint links and clearing Backlog filters preserve the category for return navigation. Reordering changes neighbors within the visible lifecycle group while submitting the full project sprint order and preserving the other groups. Closed sprints remain viewable and editable through their separate tab.
+
+## Active sprint always available
+
+There is no Active tab. The single active sprint is displayed in a dedicated summary above Not started and Closed, and remains visible in both catalog views and selected-sprint planning workspaces. It offers planning, Board, Overview and permitted closure actions. If no sprint is active, show an explicit empty summary. Not started stays the default; legacy `sprint_state=active` links fall back to Not started while keeping the active summary accessible. The server continues to enforce one active sprint per project.

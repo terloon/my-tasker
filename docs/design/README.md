@@ -22,14 +22,14 @@ If your browser restricts local embedded previews, serve this directory on loopb
 | 04 | [Project overview](04-project-overview/design.md) | Page | `/projects/:id` | [Preview](04-project-overview/index.html) |
 | 05 | [Planning](05-planning/design.md) | Page | `/projects/:id/planning` | [Preview](05-planning/index.html) |
 | 06 | [Item list and query](06-item-list/design.md) | Page | `/items` | [Preview](06-item-list/index.html) |
-| 07 | [Sprint board](07-sprint-board/design.md) | Page | `/projects/:id/sprints/:sprintId` | [Preview](07-sprint-board/index.html) |
+| 07 | [Sprint overview and board](07-sprint-board/design.md) | Page | `/projects/:id/sprints/:sprintId` | [Preview](07-sprint-board/index.html) |
 | 08 | [Item detail](08-item-detail/design.md) | Page | `/projects/:id/items/:itemId` | [Preview](08-item-detail/index.html) |
 | 09 | [User administration](09-users/design.md) | Page | `/admin/users` | [Preview](09-users/index.html) |
 | 10 | [Project permissions](10-project-permissions/design.md) | Page | `/projects/:id/settings/permissions` | [Preview](10-project-permissions/index.html) |
 | 11 | [Appearance](11-appearance/design.md) | Page | `/settings/appearance` | [Preview](11-appearance/index.html) |
 | 12 | [Account and password](12-account-security/design.md) | Page | `/settings/account` | [Preview](12-account-security/index.html) |
 | 13 | [Create or edit project](13-project-editor/design.md) | Dialog | `Home or Project overview overlay` | [Preview](13-project-editor/index.html) |
-| 14 | [Create or rename sprint](14-sprint-editor/design.md) | Dialog | `Planning overlay` | [Preview](14-sprint-editor/index.html) |
+| 14 | [Create or edit sprint](14-sprint-editor/design.md) | Dialog | `Planning overlay` | [Preview](14-sprint-editor/index.html) |
 | 15 | [Start sprint](15-sprint-start/design.md) | Dialog | `Planning or Sprint board overlay` | [Preview](15-sprint-start/index.html) |
 | 16 | [Close sprint and move work](16-sprint-close/design.md) | Dialog | `Planning or Sprint board overlay` | [Preview](16-sprint-close/index.html) |
 | 17 | [Create item](17-item-create/design.md) | Dialog | `Home, Planning, List or Sprint overlay` | [Preview](17-item-create/index.html) |
@@ -61,7 +61,7 @@ These have no additional routes/folders because their design is included with th
 | Project switcher, account menu, appearance shortcut, collapsed navigation | [Shared components](components.md) |
 | Query builder, column chooser, sorting and pagination | [Item list](06-item-list/design.md) |
 | Backlog selection, sprint ordering, item ranking and load-more | [Planning](05-planning/design.md) |
-| Card action menu and per-column load-more | [Sprint board](07-sprint-board/design.md) |
+| Card action menu and per-column load-more | [Sprint overview and board](07-sprint-board/design.md) |
 | Title/description editing and state/type/priority/assignee/label pickers | [Item detail](08-item-detail/design.md) |
 | Comment compose/edit/delete, upload/progress/retry and attachment actions | [Item detail](08-item-detail/design.md) |
 | Project and item activity | [Project overview](04-project-overview/design.md), [Item detail](08-item-detail/design.md) |
@@ -82,3 +82,5 @@ These have no additional routes/folders because their design is included with th
 5. Mark a screen Approved only after user review. All surfaces currently say Ready for review.
 
 The design baseline does not add deferred features: no sprint pause, custom workflows, remote access, estimates, notifications, JQL, or separate activity/label/comment management routes.
+
+The November 9 sprint-planning revision updates screens 05, 07 and 14: sprint catalog → selected planning workspace, optional descriptions, and Overview/Board navigation. [Current sprint list](../verification/screenshots/planning-sprints.jpg) · [Selected planning](../verification/screenshots/planning-selected.jpg) · [Sprint overview](../verification/screenshots/sprint-overview.jpg). Original v2 screenshots remain historical references.

@@ -4,7 +4,7 @@
 2. Copy its generated username and UUID password. The secret is shown only once.
 3. In each applicable project's Permissions screen, grant Project View and the required resource CRUD rights. A write grant also needs View; comments/files need Item View. Do not grant more than the agent needs.
 4. Exchange username/password at `POST /api/v1/auth/token`. Keep the returned opaque token in local secret/environment configuration.
-5. Configure a Streamable HTTP MCP client for `http://127.0.0.1:8080/mcp` with an `Authorization: Bearer ...` header. This implementation uses local header authentication. OAuth-only clients and remote/cloud access are outside this version.
+5. Configure a Streamable HTTP MCP client for `http://127.0.0.1:18473/mcp` (or the `PLANNER_PORT` chosen in `.env`) with an `Authorization: Bearer ...` header. This implementation uses local header authentication. OAuth-only clients and remote/cloud access are outside this version.
 
 The official Python MCP SDK **1.30.0** is pinned and covered by an actual protocol handshake/discovery/tool-call test. Example using its client API:
 
@@ -20,7 +20,7 @@ async def main():
         "Authorization": "Bearer " + os.environ["PLANNER_API_TOKEN"]
     }) as http:
         async with streamable_http_client(
-            os.environ.get("PLANNER_URL", "http://127.0.0.1:8080") + "/mcp",
+            os.environ.get("PLANNER_URL", "http://127.0.0.1:18473") + "/mcp",
             http_client=http,
         ) as (read, write, _):
             async with ClientSession(read, write) as session:
@@ -40,3 +40,5 @@ Useful tools include `query_items`, `get_item`, `create_item`, `update_item`, `l
 Blocked work needs Blocked by links. Readiness never authorizes an automatic resume: explicitly call `resume_item`. Cancellation/deletion requires the preview's current impact revision and acknowledgment; removing the last blocker automatically produces Open. Both REST and MCP check the same permissions and record the actual agent as actor.
 
 For a local sibling container, join `local-planner` and use `http://app:8080/mcp`. Keep the host port on loopback. Tokens expire after 24 hours by default; exchange the stored username/UUID password again when needed. Rotating the password or disabling the user revokes prior tokens. Revoked project grants take effect on the next tool call, including already connected clients.
+
+Sprint tools now support descriptions: `create_sprint` accepts optional `description` (default empty); `update_sprint` accepts optional `name` and/or `description` with `expected_version`. Existing name-only calls remain valid. `get_sprint`/`list_sprints` return description and authorized state counts. An omitted description is preserved; an empty string clears it.

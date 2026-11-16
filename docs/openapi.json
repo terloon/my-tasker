@@ -1554,7 +1554,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Name"
+                "$ref": "#/components/schemas/SprintCreate"
               }
             }
           }
@@ -1779,8 +1779,8 @@
         "tags": [
           "Sprints"
         ],
-        "summary": "Rename Sprint",
-        "operationId": "rename_sprint_api_v1_sprints__sprint_id__patch",
+        "summary": "Update Sprint",
+        "operationId": "update_sprint_api_v1_sprints__sprint_id__patch",
         "parameters": [
           {
             "name": "sprint_id",
@@ -1815,7 +1815,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Name"
+                "$ref": "#/components/schemas/SprintPatch"
               }
             }
           }
@@ -2173,6 +2173,16 @@
               "default": 0,
               "title": "Cancelled Offset"
             }
+          },
+          {
+            "name": "open_question_offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0,
+              "title": "Open Question Offset"
+            }
           }
         ],
         "responses": {
@@ -2263,6 +2273,7 @@
               "items": {
                 "enum": [
                   "open",
+                  "open_question",
                   "in_progress",
                   "blocked",
                   "done",
@@ -2475,6 +2486,303 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ItemPage"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiToken": []
+          },
+          {
+            "BrowserSession": []
+          }
+        ]
+      }
+    },
+    "/api/v1/items/hierarchy": {
+      "get": {
+        "tags": [
+          "Items"
+        ],
+        "summary": "Item Hierarchy",
+        "description": "Page by top-level items and return each branch in parent-first order.",
+        "operationId": "item_hierarchy_api_v1_items_hierarchy_get",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "title": "Project Id"
+            }
+          },
+          {
+            "name": "sprint_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "title": "Sprint Id"
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "enum": [
+                  "story",
+                  "task",
+                  "bug"
+                ],
+                "type": "string"
+              },
+              "title": "Type"
+            }
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "enum": [
+                  "open",
+                  "open_question",
+                  "in_progress",
+                  "blocked",
+                  "done",
+                  "cancelled"
+                ],
+                "type": "string"
+              },
+              "title": "State"
+            }
+          },
+          {
+            "name": "assignee_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "title": "Assignee Id"
+            }
+          },
+          {
+            "name": "label_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "title": "Label Id"
+            }
+          },
+          {
+            "name": "priority",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "enum": [
+                  "none",
+                  "low",
+                  "medium",
+                  "high",
+                  "urgent"
+                ],
+                "type": "string"
+              },
+              "title": "Priority"
+            }
+          },
+          {
+            "name": "backlog",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Backlog"
+            }
+          },
+          {
+            "name": "unassigned",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Unassigned"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 500
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Q"
+            }
+          },
+          {
+            "name": "updated_since",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Updated Since"
+            }
+          },
+          {
+            "name": "blocked_by_item_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Blocked By Item Id"
+            }
+          },
+          {
+            "name": "blocks_item_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Blocks Item Id"
+            }
+          },
+          {
+            "name": "ready_to_resume",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Ready To Resume"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "key",
+                "title",
+                "priority",
+                "state",
+                "created_at",
+                "updated_at",
+                "rank"
+              ],
+              "type": "string",
+              "default": "updated_at",
+              "title": "Sort"
+            }
+          },
+          {
+            "name": "direction",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "type": "string",
+              "default": "desc",
+              "title": "Direction"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HierarchyPage"
                 }
               }
             }
@@ -4519,6 +4827,232 @@
         "type": "object",
         "title": "HTTPValidationError"
       },
+      "HierarchyItem": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "project_id": {
+            "type": "string",
+            "title": "Project Id"
+          },
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "story",
+              "task",
+              "bug"
+            ],
+            "title": "Type"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "open",
+              "open_question",
+              "in_progress",
+              "blocked",
+              "done",
+              "cancelled"
+            ],
+            "title": "State"
+          },
+          "priority": {
+            "type": "string",
+            "enum": [
+              "none",
+              "low",
+              "medium",
+              "high",
+              "urgent"
+            ],
+            "title": "Priority"
+          },
+          "sprint_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sprint Id"
+          },
+          "sprint_name": {
+            "type": "string",
+            "title": "Sprint Name"
+          },
+          "sprint_state": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sprint State"
+          },
+          "assignee_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assignee Id"
+          },
+          "assignee": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/UserOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "labels": {
+            "items": {
+              "$ref": "#/components/schemas/LabelOut"
+            },
+            "type": "array",
+            "title": "Labels"
+          },
+          "label_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Label Ids"
+          },
+          "blocker_summary": {
+            "$ref": "#/components/schemas/BlockerSummary"
+          },
+          "permissions": {
+            "additionalProperties": {
+              "additionalProperties": {
+                "type": "boolean"
+              },
+              "type": "object"
+            },
+            "type": "object",
+            "title": "Permissions"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "created_at": {
+            "type": "string",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "title": "Updated At"
+          },
+          "parent_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parent Id"
+          },
+          "depth": {
+            "type": "integer",
+            "title": "Depth"
+          },
+          "has_children": {
+            "type": "boolean",
+            "title": "Has Children"
+          },
+          "matches_filters": {
+            "type": "boolean",
+            "title": "Matches Filters"
+          }
+        },
+        "additionalProperties": true,
+        "type": "object",
+        "required": [
+          "id",
+          "project_id",
+          "key",
+          "title",
+          "description",
+          "type",
+          "state",
+          "priority",
+          "sprint_id",
+          "sprint_name",
+          "sprint_state",
+          "assignee_id",
+          "assignee",
+          "labels",
+          "label_ids",
+          "blocker_summary",
+          "permissions",
+          "version",
+          "created_at",
+          "updated_at",
+          "parent_id",
+          "depth",
+          "has_children",
+          "matches_filters"
+        ],
+        "title": "HierarchyItem"
+      },
+      "HierarchyPage": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/HierarchyItem"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "offset": {
+            "type": "integer",
+            "title": "Offset"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          }
+        },
+        "additionalProperties": true,
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "offset",
+          "limit"
+        ],
+        "title": "HierarchyPage"
+      },
       "ItemCreate": {
         "properties": {
           "title": {
@@ -4546,6 +5080,7 @@
             "type": "string",
             "enum": [
               "open",
+              "open_question",
               "in_progress",
               "blocked",
               "done",
@@ -4648,6 +5183,7 @@
             "type": "string",
             "enum": [
               "open",
+              "open_question",
               "in_progress",
               "blocked",
               "done",
@@ -4860,6 +5396,7 @@
                 "type": "string",
                 "enum": [
                   "open",
+                  "open_question",
                   "in_progress",
                   "blocked",
                   "done",
@@ -5321,6 +5858,28 @@
         ],
         "title": "ResumeCommand"
       },
+      "SprintCreate": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 300,
+            "minLength": 1,
+            "title": "Name"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 100000,
+            "title": "Description",
+            "default": ""
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "title": "SprintCreate"
+      },
       "SprintOut": {
         "properties": {
           "id": {
@@ -5334,6 +5893,10 @@
           "name": {
             "type": "string",
             "title": "Name"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
           },
           "state": {
             "type": "string",
@@ -5406,6 +5969,7 @@
           "id",
           "project_id",
           "name",
+          "description",
           "state",
           "position",
           "started_at",
@@ -5413,6 +5977,38 @@
           "version"
         ],
         "title": "SprintOut"
+      },
+      "SprintPatch": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 300,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "SprintPatch"
       },
       "UserCreate": {
         "properties": {

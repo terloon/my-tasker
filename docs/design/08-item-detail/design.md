@@ -123,3 +123,7 @@ Status: Ready for review.
 Decisions: the layout above is the proposed v1 baseline. Explicit user review is required before labeling this screen Approved; that label is a review record and does not block creating or refining previews.
 
 Revision notes: Dependency workflow added November 9, 2026, including required blocker links, repeated ready prompt, cancellation impact and last-link removal -> Open.
+
+## Item type identification
+
+Use the shared SVG type icons alongside visible labels: Story = green bookmark, Task = blue checked square, Bug = red bug. Shapes remain distinct without color. SVGs are decorative for assistive technology because the adjacent text supplies the name. List uses a separate Type column; boards, planning rows, item details and selected type controls use the same icons and light/dark treatment.

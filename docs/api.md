@@ -32,3 +32,19 @@ Errors have `{code,message,details,request_id}`. Denied invisible IDs return 404
 Upload multipart `file` to `/items/{id}/attachments`. The default byte limit is 25 MiB. Metadata and file finalization are recoverable; list/download exposes ready files. Text previews are bounded at 1 MiB. PNG, JPEG, GIF, WebP and BMP previews are decoded and re-encoded to safe bounded PNGs; other recognized binary files remain downloadable. HTML/SVG are never executed. UTF-8 text is returned as escaped text content.
 
 `GET /items/{id}/activity` exposes the full authorized history of item changes. Project activity retains deletion events/tombstones after the item route disappears. History is append-only, actor/source/cause attributed and committed alongside mutations. Comment/file event details require their own resource visibility. No credentials or attachment bytes enter history.
+
+## Sprint descriptions and planning
+
+`POST /projects/{project_id}/sprints` accepts `{name,description?}`; description defaults to the empty string. `PATCH /sprints/{id}` accepts name and/or description with `If-Match`. Omitted fields stay unchanged; an empty string clears the description, while null is rejected. Descriptions allow up to 100,000 characters. Reads and boards include description and authorized item-state counts. The additive `0002` migration gives existing sprints empty descriptions without changing versions or item membership.
+
+Planning first loads the ordered sprint collection. Selecting `?sprint=<id>` loads that sprint's full item ordering scope and a separately paginated, filterable Backlog. Moves use the existing bulk-move endpoint; drag reorder uses `/projects/{id}/item-order` with all member IDs and expected versions. Backlog filters never narrow the reorder scope.
+
+Set an item's state to `open_question` to flag it for discussion. Item queries accept `state=open_question`, and sprint counts and boards include that state. Change it back through the versioned item update with `{"state":"open"}`. While the state is `open_question`, Open is the only available state transition. The sprint start command returns `409 sprint_open_questions` if any item assigned to it still has that state. Backlog items and items in other sprints do not affect this check. The error includes the count for callers who can view the project's items.
+
+## Backlog order
+
+Use `PUT /projects/{project_id}/item-order` with `sprint_id: null`, the **complete unfiltered** ordered Backlog ID list and all current item versions. Reads use `backlog=true&sort=rank&direction=asc`. A partial or changed scope is rejected; stale versions fail atomically. Reordering uses item update permission, records activity and leaves item state and priority unchanged. The client exposes drag, up/down, global top and global end actions; filtered up/down crosses pages while hidden items retain relative order. No schema migration is required for the ordering controls.
+
+## Item hierarchy
+
+`GET /items/hierarchy` accepts the same filters and sorts as `GET /items`. It returns matching items and their visible ancestors in parent-first order. Each row includes `parent_id`, `depth`, `has_children` for the current results and `matches_filters`. The pagination fields count top-level items and each page includes their full matching branches, including links that span sprints.

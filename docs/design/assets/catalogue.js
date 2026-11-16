@@ -130,15 +130,17 @@ window.DESIGN_SCREENS = [
     "group": "Main pages",
     "surface": "Page",
     "route": "/projects/:id/planning",
-    "purpose": "Organize Backlog and ordered sprints without changing item states.",
-    "layout": "Backlog panel at left; ordered sprint sections at right. Each sprint has lifecycle, counts, and contextual actions. Bulk selection exposes a slim move bar.",
+    "purpose": "Choose a sprint, then plan its ordered work above a filterable Backlog.",
+    "layout": "The single active sprint is always shown above Not started (default) and Closed tabs. Selected-sprint planning keeps the active summary accessible, with ordered sprint items above a filterable and reorderable Backlog. List and row type icons follow the shared type treatment.",
     "actions": [
       "Create sprint",
       "Reorder sprints",
       "Move selected items",
       "Start sprint",
       "Close sprint",
-      "Create item"
+      "Create item",
+      "Reorder Backlog",
+      "Move Backlog item to top"
     ],
     "states": [
       "default",
@@ -150,9 +152,10 @@ window.DESIGN_SCREENS = [
     ],
     "permissions": "Item and sprint view are required for their sections; moves require item update, sprint commands require sprint update.",
     "apis": [
-      "GET /projects/{project_id}/planning",
+      "GET /projects/{project_id}/sprints",
       "GET /items",
       "PUT /projects/{project_id}/sprint-order",
+      "PUT /projects/{project_id}/item-order",
       "POST /projects/{project_id}/items/bulk-move"
     ],
     "checks": [
@@ -170,7 +173,7 @@ window.DESIGN_SCREENS = [
     "surface": "Page",
     "route": "/items",
     "purpose": "Find work using a reusable, shareable set of structured filters.",
-    "layout": "Title, project context, search and filter chips, optional filter builder, compact table, count and pagination footer. No separate advanced-query screen.",
+    "layout": "Title, project context, search and filter chips, optional filter builder, compact table, count and pagination footer. No separate advanced-query screen. Type has its own icon-and-label column; titles contain no type badge.",
     "actions": [
       "Filter and sort",
       "Open item",
@@ -203,12 +206,12 @@ window.DESIGN_SCREENS = [
   },
   {
     "id": "07-sprint-board",
-    "name": "Sprint board",
+    "name": "Sprint overview and board",
     "group": "Main pages",
     "surface": "Page",
     "route": "/projects/:id/sprints/:sprintId",
     "purpose": "Track the selected sprint through five explicit item states.",
-    "layout": "Sprint title, lifecycle and timestamps; sprint selector; five equal state columns with counts, compact cards and column pagination. Horizontal scrolling stays inside the board.",
+    "layout": "Overview/Board navigation. Overview shows the optional Markdown description, all five item-state counts and completion; Board retains the state columns. Story uses a green bookmark, Task a blue checked square, Bug a red bug; retain visible labels.",
     "actions": [
       "Change item state",
       "Open item",
@@ -218,6 +221,7 @@ window.DESIGN_SCREENS = [
     ],
     "states": [
       "default",
+      "overview",
       "planned",
       "closed",
       "empty",
@@ -229,7 +233,8 @@ window.DESIGN_SCREENS = [
     "apis": [
       "GET /sprints/{sprint_id}/board",
       "GET /projects/{project_id}/sprints",
-      "PATCH /items/{item_id}"
+      "PATCH /items/{item_id}",
+      "GET /sprints/{sprint_id}"
     ],
     "checks": [
       "Column order is Open, In progress, Blocked, Done, Cancelled.",
@@ -246,7 +251,7 @@ window.DESIGN_SCREENS = [
     "surface": "Page",
     "route": "/projects/:id/items/:itemId",
     "purpose": "Read and edit a work item, its links, discussion, files, and complete historical activity list.",
-    "layout": "Key, title and overflow above a two-column detail page. Description, links, attachments and discussion occupy the main column; state/type/sprint/assignee/priority/labels occupy a 270px properties column.",
+    "layout": "Key, title and overflow above a two-column detail page. Description, links, attachments and discussion occupy the main column; state/type/sprint/assignee/priority/labels occupy a 270px properties column. Story uses a green bookmark, Task a blue checked square, Bug a red bug; retain visible labels.",
     "actions": [
       "Edit title or description",
       "Change properties",
@@ -453,16 +458,16 @@ window.DESIGN_SCREENS = [
   },
   {
     "id": "14-sprint-editor",
-    "name": "Create or rename sprint",
+    "name": "Create or edit sprint",
     "group": "Work dialogs",
     "surface": "Dialog",
     "route": "Planning overlay",
     "parent": "05-planning",
-    "purpose": "Name a sprint without adding scheduling requirements.",
-    "layout": "440px dialog with one Name field and a line showing the project/order context.",
+    "purpose": "Set the sprint name and optional description.",
+    "layout": "Name and optional multiline Markdown description; existing sprints start with an empty description.",
     "actions": [
       "Create sprint",
-      "Save name",
+      "Save changes",
       "Cancel"
     ],
     "states": [

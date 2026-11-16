@@ -14,7 +14,7 @@ Parent surface: [05-planning](../05-planning/design.md).
 
 ## Layout to preserve
 
-440px dialog with one Name field and a line showing the project/order context.
+Name and optional multiline Markdown description; existing sprints start with an empty description.
 
 Use the shared application shell, typography, spacing, colors and component rules. This screen does not establish its own palette or navigation model. The HTML preview is a visual baseline; the rules in this document define the complete behavior beyond the demonstrative interactions.
 
@@ -79,3 +79,7 @@ Status: Ready for review.
 Decisions: the layout above is the proposed v1 baseline. Explicit user review is required before labeling this screen Approved; that label is a review record and does not block creating or refining previews.
 
 Revision notes: None yet.
+
+## Sprint planning redesign
+
+Sprint descriptions are optional, support safe Markdown, and are editable after creation. Migration gives existing sprints an empty description while preserving names, contents, lifecycle and versions. Planning opens on all sprints; selected planning uses `?sprint=<id>`, with sprint items above a filtered Backlog. New items append; sprint rows can be dragged before another row or to the end. Reordering submits the complete membership and version snapshot. Search, type, state, priority, assignee and label filters apply only to Backlog. Buttons offer add, move and up/down equivalents. Sprint Overview and Board are selected using `?view=overview|board`; the default is Overview.

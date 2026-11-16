@@ -46,6 +46,8 @@ The interactive command accepts an existing human account, asks twice for a new 
 
 ## Configuration
 
+Copy `.env.sample` to `.env` and set `PLANNER_PORT` for the Compose host port. The default is `18473`; Compose publishes `127.0.0.1:18473` to the container's port `8080` and derives both localhost browser origins from that value. Apply changes with `docker compose up -d`. The persistent volume is retained. Sibling containers continue to use `http://app:8080`; native development still uses port `8080` unless changed separately. `PLANNER_PORT` configures Compose, not Uvicorn inside the container.
+
 All settings use the `PLANNER_` prefix: `DATA_DIR`, `FRONTEND_DIR`, `ALLOWED_HOSTS`, `ALLOWED_ORIGINS`, `SESSION_HOURS`, `TOKEN_HOURS`, `MAX_FILE_BYTES`, `TEXT_PREVIEW_BYTES`, `SECURE_COOKIES`. Allowed hosts/origins are comma-separated exact local entries; include the browser's actual port. Use Secure cookies if HTTPS is configured later. Current deployment is local HTTP only.
 
 Logs contain request IDs, operational errors and startup status. They do not log passwords, bearer/session headers, comment bodies or file contents. Activity is the durable user-facing mutation record, not the HTTP access log.

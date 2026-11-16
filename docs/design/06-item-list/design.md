@@ -46,6 +46,7 @@ Hide actions the user can never perform. When a permitted action is temporarily 
 ## Data and service contract
 
 - `GET /items`
+- `GET /items/hierarchy`
 - `GET /metadata`
 - `GET /projects/{project_id}/labels`
 - `GET /projects/{project_id}/assignees`
@@ -53,6 +54,9 @@ Hide actions the user can never perform. When a permitted action is temporarily 
 Paths are relative to `/api/v1` where applicable. This preview uses fictional in-memory fixtures and performs no API requests. The implementation plan is authoritative for authentication, authorization and transactional invariants.
 
 ## Interaction and responsive behavior
+
+- List is the default. Hierarchy uses the same columns and indents items beneath their parents. Branches start expanded and each parent has a keyboard-operable expand/collapse button. The selected view is saved in the URL.
+- Filters keep matching items and their ancestors. Ancestors outside the filters are labeled and excluded from new bulk selections. Pagination keeps each top-level branch together.
 
 - Desktop: shared 208px sidebar, 58px header, 30px content padding; primary action follows the page title or appears in the dialog footer.
 - Tablet: stack supporting content before reducing readable text size. Keep wide tables/board columns in their own scroll containers.
@@ -90,3 +94,7 @@ Status: Ready for review.
 Decisions: the layout above is the proposed v1 baseline. Explicit user review is required before labeling this screen Approved; that label is a review record and does not block creating or refining previews.
 
 Revision notes: Dependency workflow added November 9, 2026, including required blocker links, repeated ready prompt, cancellation impact and last-link removal -> Open.
+
+## Item type identification
+
+Use the shared SVG type icons alongside visible labels: Story = green bookmark, Task = blue checked square, Bug = red bug. Shapes remain distinct without color. SVGs are decorative for assistive technology because the adjacent text supplies the name. List uses a separate Type column; boards, planning rows, item details and selected type controls use the same icons and light/dark treatment.

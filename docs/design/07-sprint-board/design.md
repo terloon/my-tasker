@@ -1,6 +1,6 @@
 # Sprint board
 
-Design baseline: v2, November 9, 2026. **Approved for implementation by the user, November 9, 2026.**
+Design baseline: v3, November 9, 2026; updated for the user-requested sprint-first planning workflow. **Approved for implementation by the user, November 9, 2026.**
 
 [Open preview](index.html) · [Review in gallery](../index.html#07-sprint-board) · [Shared design guide](../design_guide.md) · [All screens](../README.md)
 
@@ -12,7 +12,7 @@ Surface: **Page**. Route or entry: `/projects/:id/sprints/:sprintId`.
 
 ## Layout to preserve
 
-Sprint title, lifecycle and timestamps; sprint selector; five equal state columns with counts, compact cards and column pagination. Horizontal scrolling stays inside the board.
+Overview/Board navigation. Overview shows the optional Markdown description, all five item-state counts and completion; Board retains the state columns.
 
 Use the shared application shell, typography, spacing, colors and component rules. This screen does not establish its own palette or navigation model. The HTML preview is a visual baseline; the rules in this document define the complete behavior beyond the demonstrative interactions.
 
@@ -91,3 +91,11 @@ Status: Ready for review.
 Decisions: the layout above is the proposed v1 baseline. Explicit user review is required before labeling this screen Approved; that label is a review record and does not block creating or refining previews.
 
 Revision notes: Dependency workflow added November 9, 2026, including required blocker links, repeated ready prompt, cancellation impact and last-link removal -> Open.
+
+## Sprint planning redesign
+
+Sprint descriptions are optional, support safe Markdown, and are editable after creation. Migration gives existing sprints an empty description while preserving names, contents, lifecycle and versions. Planning opens on all sprints; selected planning uses `?sprint=<id>`, with sprint items above a filtered Backlog. New items append; sprint rows can be dragged before another row or to the end. Reordering submits the complete membership and version snapshot. Search, type, state, priority, assignee and label filters apply only to Backlog. Buttons offer add, move and up/down equivalents. Sprint Overview and Board are selected using `?view=overview|board`; the default is Overview.
+
+## Item type identification
+
+Use the shared SVG type icons alongside visible labels: Story = green bookmark, Task = blue checked square, Bug = red bug. Shapes remain distinct without color. SVGs are decorative for assistive technology because the adjacent text supplies the name. List uses a separate Type column; boards, planning rows, item details and selected type controls use the same icons and light/dark treatment.

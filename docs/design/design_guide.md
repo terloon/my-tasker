@@ -163,3 +163,13 @@ Follow [the full dependency design](dependency_flow.md). Entering Blocked requir
 ## Required item history
 
 Every committed item change must be recorded and available in the Item detail Activity tab, including human, agent and automatic system actions. This is a confirmed product requirement. Show actor/kind, time, readable change, old/new values where appropriate and cause/operation grouping; stable pagination must reach the complete authorized history. History is durable and read-only, separate from Comments. See [Item detail](08-item-detail/design.md) and the implementation plan for coverage, retention and permission rules.
+
+## Sprint planning revision (November 9, 2026)
+
+Planning now starts with a sprint catalog. A selected sprint opens a vertical workspace: complete ordered sprint items above a filterable Backlog. Sprint descriptions are optional Markdown, with empty descriptions on preexisting sprints. Sprint pages switch between Overview (description and state statistics) and Board. Existing theme, permission, version-conflict and keyboard-equivalence rules apply. See updated screens 05, 07 and 14.
+
+## Type icons and sprint lifecycle tabs
+
+Item type is identified by shape, color and text together: Story has a green bookmark; Task a blue checked square; Bug a red bug. Use the shared 18px SVG treatment with visible labels across lists, planning, board cards, detail headers and selected type controls. List has a separate Type column. Match light/dark tokens and avoid color-only identification.
+
+The Planning catalog defaults to Not started, with a separate Closed tab. A dedicated active sprint summary stays above both lists and selected-sprint workspaces. There is no Active tab. Keep category counts visible and preserve the chosen view when returning from a selected sprint.
