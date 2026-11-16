@@ -6,6 +6,8 @@ export type Item = components["schemas"]["ItemOut"] & {
   rank: number;
   project_name: string;
 };
+export type HierarchyItem = Item & components["schemas"]["HierarchyItem"];
+export type HierarchyPage = Page<HierarchyItem>;
 export type Sprint = components["schemas"]["SprintOut"];
 export type Label = components["schemas"]["LabelOut"];
 export type Page<T> = {
@@ -199,11 +201,14 @@ export async function reorderItem(item: Item, delta: number) {
 
 export const states = [
   "open",
+  "open_question",
   "in_progress",
   "blocked",
   "done",
   "cancelled",
 ] as const;
+export const itemStateOptions = (state: Item["state"]) =>
+  state === "open_question" ? (["open", "open_question"] as const) : states;
 export const types = ["story", "task", "bug"] as const;
 export const priorities = ["none", "low", "medium", "high", "urgent"] as const;
 export const label = (s: string) =>

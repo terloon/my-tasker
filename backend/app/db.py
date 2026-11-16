@@ -43,5 +43,17 @@ def migrate(engine):
     config = Config(str(base / "alembic.ini"))
     config.set_main_option("script_location", str(base / "migrations"))
     with engine.connect() as connection:
-        config.attributes["connection"] = connection
-        command.upgrade(config, "head")
+        # Table rebuilds must keep referencing rows when the old table is dropped.
+        connection.exec_driver_sql("PRAGMA foreign_keys=OFF")
+        try:
+            connection.exec_driver_sql("BEGIN IMMEDIATE")
+            config.attributes["connection"] = connection
+            command.upgrade(config, "head")
+            if connection.exec_driver_sql("PRAGMA foreign_key_check").first() is not None:
+                raise RuntimeError("The database failed its migration foreign-key check.")
+            connection.commit()
+        except BaseException:
+            connection.rollback()
+            raise
+        finally:
+            connection.exec_driver_sql("PRAGMA foreign_keys=ON")

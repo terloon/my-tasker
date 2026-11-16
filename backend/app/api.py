@@ -516,10 +516,10 @@ def sprints(
 @router.post(
     "/projects/{project_id}/sprints", response_model=s.SprintOut, status_code=201, tags=["Sprints"]
 )
-def create_sprint(request: Request, project_id: str, body: s.Name):
+def create_sprint(request: Request, project_id: str, body: s.SprintCreate):
     return run(
         request,
-        lambda service: service.create_sprint(project_id, body.name),
+        lambda service: service.create_sprint(project_id, body.name, body.description),
         True,
         body.model_dump(),
         201,
@@ -547,10 +547,10 @@ def sprint(request: Request, sprint_id: str):
 
 
 @router.patch("/sprints/{sprint_id}", response_model=s.SprintOut, tags=["Sprints"])
-def rename_sprint(request: Request, sprint_id: str, body: s.Name):
+def update_sprint(request: Request, sprint_id: str, body: s.SprintPatch):
     return run(
         request,
-        lambda service: service.update_sprint(sprint_id, body.name, expected(request)),
+        lambda service: service.update_sprint(sprint_id, data(body), expected(request)),
         True,
         body.model_dump(),
     )
@@ -606,11 +606,19 @@ def board(
     blocked_offset: int = 0,
     done_offset: int = 0,
     cancelled_offset: int = 0,
+    open_question_offset: int = 0,
 ):
     offsets = dict(
         zip(
             m.STATES,
-            (open_offset, in_progress_offset, blocked_offset, done_offset, cancelled_offset),
+            (
+                open_offset,
+                open_question_offset,
+                in_progress_offset,
+                blocked_offset,
+                done_offset,
+                cancelled_offset,
+            ),
         )
     )
     return run(request, lambda service: service.board(sprint_id, offsets, limit))
@@ -619,6 +627,12 @@ def board(
 @router.get("/items", response_model=s.ItemPage, tags=["Items"])
 def items(request: Request, query: Annotated[s.ItemQuery, Query()]):
     return run(request, lambda service: service.query_items(query.model_dump()))
+
+
+@router.get("/items/hierarchy", response_model=s.HierarchyPage, tags=["Items"])
+def item_hierarchy(request: Request, query: Annotated[s.ItemQuery, Query()]):
+    """Page by top-level items and return each branch in parent-first order."""
+    return run(request, lambda service: service.query_items(query.model_dump(), hierarchy=True))
 
 
 @router.post(

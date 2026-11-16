@@ -1,15 +1,16 @@
+import { ItemType, TypeSelect } from "./ItemType";
 import { ask } from "./ui";
 import { useEffect, useRef, useState } from "react";
-import { Link, useBlocker, useParams } from "react-router-dom";
-import ReactMarkdown from "react-markdown";
+import { Link, useBlocker, useLocation, useParams } from "react-router-dom";
+import { Markdown } from "./Markdown";
 import {
   api,
   uploadAttachment,
   can,
+  itemStateOptions,
   label,
   priorities,
   query,
-  states,
   types,
   when,
   type Attachment,
@@ -35,6 +36,7 @@ import {
   State,
   useCollection,
   useData,
+  useItem,
   useWrite,
 } from "./ui";
 import {
@@ -50,8 +52,10 @@ export default function ItemDetail() {
   return <Detail key={itemId} itemId={itemId!} />;
 }
 function Detail({ itemId }: { itemId: string }) {
-  const q = useData<Item>(["item", itemId], `/items/${itemId}`);
+  const q = useItem(itemId);
   const item = q.data;
+  const { state: locationState } = useLocation();
+  const planningSearch = locationState?.planningSearch;
   const w = useWrite();
   const [tab, setTab] = useState("comments");
   const [editing, setEditing] = useState(false);
@@ -168,8 +172,14 @@ function Detail({ itemId }: { itemId: string }) {
   return (
     <>
       <div className="eyebrow">
-        <Link to={"/items?project_id=" + i.project_id}>Items</Link> / {i.key}{" "}
-        <span className="badge">{label(i.type)}</span>
+        {typeof planningSearch === "string" ? (
+          <Link to={`/projects/${i.project_id}/planning?${planningSearch}`}>
+            Back to sprint planning
+          </Link>
+        ) : (
+          <Link to={"/items?project_id=" + i.project_id}>Items</Link>
+        )}{" "}
+        / {i.key} <ItemType type={i.type} />
       </div>
       <Heading
         title={i.title}
@@ -229,7 +239,7 @@ function Detail({ itemId }: { itemId: string }) {
       )}
       <div className="detail-grid">
         <div>
-          <section>
+          <section className="item-description">
             <div className="section-head">
               <h2>Description</h2>
               {can(i, "item", "update") && (
@@ -338,11 +348,7 @@ function Detail({ itemId }: { itemId: string }) {
                 </div>
               </div>
             ) : (
-              <div className="prose markdown">
-                <ReactMarkdown skipHtml>
-                  {i.description || "No description yet."}
-                </ReactMarkdown>
-              </div>
+              <Markdown>{i.description || "No description yet."}</Markdown>
             )}
           </section>
           <section className="section">
@@ -420,7 +426,7 @@ function Detail({ itemId }: { itemId: string }) {
               value={i.state}
               onChange={(e) => changeState(e.target.value).catch(() => {})}
             >
-              {states.map((s) => (
+              {itemStateOptions(i.state).map((s) => (
                 <option key={s} value={s}>
                   {label(s)}
                 </option>
@@ -428,7 +434,7 @@ function Detail({ itemId }: { itemId: string }) {
             </select>
           </Field>
           <Field name="Type">
-            <select
+            <TypeSelect
               disabled={!can(i, "item", "update")}
               value={i.type}
               onChange={(e) => update({ type: e.target.value }).catch(() => {})}
@@ -438,7 +444,7 @@ function Detail({ itemId }: { itemId: string }) {
                   {label(s)}
                 </option>
               ))}
-            </select>
+            </TypeSelect>
           </Field>
           <Field name="Sprint">
             <select
@@ -926,16 +932,14 @@ function Comments({ item }: { item: Item }) {
                   )}
                 </div>
                 {editing?.id === c.id ? (
-                  <Field name="Edit comment">
+                  <Field name="Edit comment" hint="Markdown supported.">
                     <textarea
                       value={body}
                       onChange={(e) => setBody(e.target.value)}
                     />
                   </Field>
                 ) : (
-                  <div className="markdown">
-                    <ReactMarkdown skipHtml>{c.body}</ReactMarkdown>
-                  </div>
+                  <Markdown>{c.body}</Markdown>
                 )}
                 <div className="row">
                   {can(item, "comment", "update") && (
@@ -980,7 +984,10 @@ function Comments({ item }: { item: Item }) {
       {!!w.error && <ErrorBox error={w.error} />}{" "}
       {(can(item, "comment", "create") || editing) && (
         <div className="stack">
-          <Field name={editing ? "Edited comment" : "Add a comment"}>
+          <Field
+            name={editing ? "Edited comment" : "Add a comment"}
+            hint="Markdown supported."
+          >
             <textarea
               className="comment-compose"
               value={body}
@@ -1197,7 +1204,11 @@ function FilePreview({
           <ErrorBox error={q.error} />
         ) : (
           <>
-            <pre className="text-preview">{q.data?.text}</pre>
+            {/\.(md|markdown)$/i.test(a.filename) ? (
+              <Markdown>{q.data?.text ?? ""}</Markdown>
+            ) : (
+              <pre className="text-preview">{q.data?.text}</pre>
+            )}
             {q.data?.truncated && (
               <p className="small muted">
                 Preview truncated. Download the complete file.

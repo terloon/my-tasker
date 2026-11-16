@@ -1,3 +1,4 @@
+import { TypeSelect } from "./ItemType";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -117,12 +118,16 @@ export function SprintEditor({
   onClose: () => void;
 }) {
   const [name, setName] = useState(sprint?.name || "");
+  const [description, setDescription] = useState(sprint?.description || "");
   const w = useWrite();
   return (
     <Modal
-      title={sprint ? "Rename sprint" : "Create sprint"}
+      title={sprint ? "Edit sprint" : "Create sprint"}
       onClose={onClose}
-      dirty={name !== (sprint?.name || "")}
+      dirty={
+        name !== (sprint?.name || "") ||
+        description !== (sprint?.description || "")
+      }
       footer={
         <>
           <button className="btn" onClick={onClose}>
@@ -140,7 +145,7 @@ export function SprintEditor({
                       : `/projects/${projectId}/sprints`,
                     {
                       method: sprint ? "PATCH" : "POST",
-                      body: { name },
+                      body: { name, description },
                       version: sprint?.version,
                       key: crypto.randomUUID(),
                     },
@@ -150,7 +155,7 @@ export function SprintEditor({
                 .catch(() => {})
             }
           >
-            {w.busy ? "Saving…" : sprint ? "Save name" : "Create sprint"}
+            {w.busy ? "Saving…" : sprint ? "Save changes" : "Create sprint"}
           </button>
         </>
       }
@@ -162,6 +167,17 @@ export function SprintEditor({
             value={name}
             onChange={(e) => setName(e.target.value)}
             maxLength={300}
+          />
+        </Field>
+        <Field
+          name="Description"
+          hint="Optional. Describe the sprint goal and planned work. Markdown supported."
+        >
+          <textarea
+            rows={6}
+            maxLength={100000}
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
           />
         </Field>
         <p className="small muted">
@@ -288,13 +304,13 @@ export function ItemEditor({
         </Field>
         <div className="two-fields">
           <Field name="Type">
-            <select value={type} onChange={(e) => setType(e.target.value)}>
+            <TypeSelect value={type} onChange={(e) => setType(e.target.value)}>
               {types.map((t) => (
                 <option key={t} value={t}>
                   {label(t)}
                 </option>
               ))}
-            </select>
+            </TypeSelect>
           </Field>
           <Field name="State">
             <select value={state} onChange={(e) => setState(e.target.value)}>

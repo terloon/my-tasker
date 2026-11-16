@@ -33,6 +33,7 @@ def test_real_mcp_handshake_tools_permissions_and_revocation(tmp_path):
                         "expected_revision": 1,
                         "grants": {
                             "project": {"view": True},
+                            "sprint": {"view": True, "create": True, "update": True},
                             "item": {"view": True, "create": True},
                         },
                     },
@@ -62,6 +63,49 @@ def test_real_mcp_handshake_tools_permissions_and_revocation(tmp_path):
                                 "list_activity",
                                 "resume_item",
                             }
+                            planned = await session.call_tool(
+                                "create_sprint",
+                                {
+                                    "arguments": {
+                                        "project_id": project["id"],
+                                        "name": "Agent plan",
+                                        "description": "Initial goal",
+                                    }
+                                },
+                            )
+                            assert (
+                                not planned.isError
+                                and planned.structuredContent["description"] == "Initial goal"
+                            )
+                            edited = await session.call_tool(
+                                "update_sprint",
+                                {
+                                    "arguments": {
+                                        "sprint_id": planned.structuredContent["id"],
+                                        "expected_version": planned.structuredContent["version"],
+                                        "description": "Revised goal",
+                                    }
+                                },
+                            )
+                            assert (
+                                not edited.isError
+                                and edited.structuredContent["description"] == "Revised goal"
+                            )
+                            assert edited.structuredContent["name"] == "Agent plan"
+                            renamed = await session.call_tool(
+                                "update_sprint",
+                                {
+                                    "arguments": {
+                                        "sprint_id": planned.structuredContent["id"],
+                                        "expected_version": edited.structuredContent["version"],
+                                        "name": "Renamed plan",
+                                    }
+                                },
+                            )
+                            assert (
+                                not renamed.isError
+                                and renamed.structuredContent["description"] == "Revised goal"
+                            )
                             created = await session.call_tool(
                                 "create_item",
                                 {

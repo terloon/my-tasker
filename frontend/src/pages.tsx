@@ -1,17 +1,19 @@
+import { ItemType } from "./ItemType";
 import { ask } from "./ui";
 import { useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
-import ReactMarkdown from "react-markdown";
+import { Markdown } from "./Markdown";
 import {
   api,
   can,
+  itemStateOptions,
   label,
   priorities,
   query,
-  reorderItem,
   states,
   types,
   when,
+  type HierarchyPage,
   type Item,
   type Page,
   type Project,
@@ -27,6 +29,7 @@ import {
   ItemTable,
   Loading,
   Pagination,
+  SprintQuestionsNotice,
   State,
   useCollection,
   useData,
@@ -130,7 +133,7 @@ export function Home() {
               <h2>Assigned to you</h2>
               <Link to={"/items?assignee_id=" + user.id}>View all →</Link>
             </div>
-            <ItemTable data={q.data.assigned} />
+            <ItemTable items={q.data.assigned.items} />
           </section>
           {q.data.ready.total > 0 && (
             <section className="section">
@@ -138,7 +141,7 @@ export function Home() {
                 <h2>Ready to resume</h2>
                 <Link to="/items?ready_to_resume=true">View all →</Link>
               </div>
-              <ItemTable data={q.data.ready} />
+              <ItemTable items={q.data.ready.items} />
             </section>
           )}
         </>
@@ -221,11 +224,7 @@ export function ProjectOverview() {
         <>
           <section className="panel">
             <h2>About this project</h2>
-            <div className="prose markdown">
-              <ReactMarkdown>
-                {p.description || "No description yet."}
-              </ReactMarkdown>
-            </div>
+            <Markdown>{p.description || "No description yet."}</Markdown>
             <div className="row">
               <Link className="btn primary" to={`/projects/${p.id}/planning`}>
                 Open Planning
@@ -286,454 +285,7 @@ export function ProjectOverview() {
   );
 }
 
-function SprintSection({
-  sprint,
-  selected,
-  onSelect,
-  onEdit,
-  onCloseSprint,
-  onStart,
-  onMove,
-  onCreate,
-}: {
-  sprint: Sprint;
-  selected: Set<string>;
-  onSelect: (i: Item) => void;
-  onEdit: () => void;
-  onCloseSprint: () => void;
-  onStart: () => void;
-  onMove: (i: Item) => void;
-  onCreate: () => void;
-}) {
-  const [offset, setOffset] = useState(0);
-  const q = useData<Page<Item>>(
-    ["sprint-items", sprint.id, offset],
-    "/items?" +
-      query({
-        project_id: [sprint.project_id],
-        sprint_id: [sprint.id],
-        sort: "rank",
-        direction: "asc",
-        offset,
-      }),
-    true,
-  );
-  const { project } = useWorkspace();
-  const w = useWrite();
-  return (
-    <section className="sprint-section">
-      <div
-        className={
-          "sprint-section-head " + (sprint.state === "active" ? "active" : "")
-        }
-      >
-        <div>
-          <h2>
-            <Link to={`/projects/${sprint.project_id}/sprints/${sprint.id}`}>
-              {sprint.name}
-            </Link>
-          </h2>
-          <span className="small muted">
-            {label(sprint.state)} · {sprint.total ?? q.data?.total ?? 0} items
-          </span>
-        </div>
-        <div className="row">
-          {can(project, "sprint", "update") && (
-            <>
-              <button className="btn small ghost" onClick={onEdit}>
-                Rename
-              </button>
-              {sprint.state !== "closed" && (
-                <button
-                  className="btn small"
-                  onClick={sprint.state === "active" ? onCloseSprint : onStart}
-                >
-                  {sprint.state === "active" ? "Close sprint" : "Start sprint"}
-                </button>
-              )}
-            </>
-          )}
-          {sprint.state === "planned" && can(project, "sprint", "delete") && (
-            <button
-              className="btn ghost small danger-text"
-              onClick={async () => {
-                if (
-                  await ask(
-                    "Delete " +
-                      sprint.name +
-                      "? Only empty, not-started sprints can be removed.",
-                  )
-                )
-                  w.execute(() =>
-                    api(`/sprints/${sprint.id}`, {
-                      method: "DELETE",
-                      version: sprint.version,
-                    }),
-                  ).catch(() => {});
-              }}
-            >
-              Delete
-            </button>
-          )}
-          {sprint.state !== "closed" && can(project, "item", "create") && (
-            <button className="btn small ghost" onClick={onCreate}>
-              + Item
-            </button>
-          )}
-        </div>
-      </div>
-      {!!w.error && <ErrorBox error={w.error} />}{" "}
-      {q.isPending ? (
-        <Loading />
-      ) : q.error ? (
-        <ErrorBox error={q.error} />
-      ) : (
-        <>
-          <ItemTable
-            data={q.data!}
-            selected={selected}
-            onSelect={can(project, "item", "update") ? onSelect : undefined}
-            onState={
-              can(project, "item", "update")
-                ? (i) => (
-                    <div className="row">
-                      <button
-                        className="btn small ghost"
-                        onClick={() => onMove(i)}
-                      >
-                        Move
-                      </button>
-                      {sprint.state !== "closed" && (
-                        <>
-                          <button
-                            className="btn small ghost"
-                            aria-label={"Move " + i.key + " up"}
-                            onClick={() =>
-                              w
-                                .execute(() => reorderItem(i, -1))
-                                .catch(() => {})
-                            }
-                          >
-                            ↑
-                          </button>
-                          <button
-                            className="btn small ghost"
-                            aria-label={"Move " + i.key + " down"}
-                            onClick={() =>
-                              w.execute(() => reorderItem(i, 1)).catch(() => {})
-                            }
-                          >
-                            ↓
-                          </button>
-                        </>
-                      )}
-                    </div>
-                  )
-                : undefined
-            }
-          />
-          <Pagination data={q.data!} onChange={setOffset} />
-        </>
-      )}
-    </section>
-  );
-}
-
-export function Planning() {
-  const { id } = useParams();
-  const { project } = useWorkspace();
-  const [offset, setOffset] = useState(0);
-  const [sprintOffset, setSprintOffset] = useState(0);
-  const [edit, setEdit] = useState<Sprint | "new" | null>(null);
-  const [close, setClose] = useState<Sprint | null>(null);
-  const [create, setCreate] = useState<string | undefined | null>(null);
-  const [moving, setMoving] = useState<Item[] | null>(null);
-  const [selected, setSelected] = useState<Record<string, Item>>({});
-  const w = useWrite();
-  const back = useData<Page<Item>>(
-    ["backlog", id, offset],
-    "/items?" +
-      query({
-        project_id: [id],
-        backlog: true,
-        sort: "rank",
-        direction: "asc",
-        offset,
-      }),
-    can(project, "item"),
-  );
-  const sp = useData<Page<Sprint>>(
-    ["planning-sprints", id, sprintOffset],
-    `/projects/${id}/sprints?offset=${sprintOffset}`,
-    can(project, "sprint"),
-  );
-  function toggle(i: Item) {
-    setSelected((s) => {
-      const next = { ...s };
-      if (next[i.id]) delete next[i.id];
-      else next[i.id] = i;
-      return next;
-    });
-  }
-  async function start(s: Sprint) {
-    if (await ask(`Start ${s.name}? This becomes the project's active sprint.`))
-      await w.execute(() =>
-        api(`/sprints/${s.id}/start`, {
-          method: "POST",
-          body: { expected_version: s.version },
-          key: crypto.randomUUID(),
-        }),
-      );
-  }
-  async function reorder(index: number, delta: number) {
-    if (!sp.data || sp.data.total !== sp.data.items.length) return;
-    const all = [...sp.data.items];
-    [all[index], all[index + delta]] = [all[index + delta], all[index]];
-    await w.execute(() =>
-      api(`/projects/${id}/sprint-order`, {
-        method: "PUT",
-        body: {
-          ordered_ids: all.map((s) => s.id),
-          versions: Object.fromEntries(all.map((s) => [s.id, s.version])),
-        },
-      }),
-    );
-  }
-  return (
-    <>
-      <Heading
-        title="Planning"
-        description="Move work into sprints. Item states stay as they are."
-        actions={
-          can(project, "sprint", "create") && (
-            <button className="btn primary" onClick={() => setEdit("new")}>
-              + New sprint
-            </button>
-          )
-        }
-      />
-      {!!w.error && <ErrorBox error={w.error} />}{" "}
-      {!!Object.keys(selected).length && (
-        <div className="quiet-band between">
-          <strong>{Object.keys(selected).length} items selected</strong>
-          <div className="row">
-            <button
-              className="btn primary"
-              onClick={() => setMoving(Object.values(selected))}
-            >
-              Move selected
-            </button>
-            <button className="btn ghost" onClick={() => setSelected({})}>
-              Clear
-            </button>
-          </div>
-        </div>
-      )}
-      <div className="planning-layout section">
-        <section
-          className="panel"
-          onDragOver={(e) => {
-            if (can(project, "item", "update")) e.preventDefault();
-          }}
-          onDrop={(e) => {
-            e.preventDefault();
-            try {
-              const moved = JSON.parse(e.dataTransfer.getData("text/plain"));
-              w.execute(() =>
-                api(`/projects/${id}/items/bulk-move`, {
-                  method: "POST",
-                  body: {
-                    item_versions: { [moved.id]: moved.version },
-                    sprint_id: null,
-                  },
-                }),
-              ).catch(() => {});
-            } catch {}
-          }}
-        >
-          <div className="section-head">
-            <h2>
-              Backlog <span className="count">{back.data?.total ?? 0}</span>
-            </h2>
-            {can(project, "item", "create") && (
-              <button
-                className="btn small ghost"
-                onClick={() => setCreate(undefined)}
-              >
-                + Add
-              </button>
-            )}
-          </div>
-          {back.error ? (
-            <ErrorBox error={back.error} />
-          ) : back.isPending ? (
-            can(project, "item") ? (
-              <Loading />
-            ) : (
-              <p className="muted">Item view access is required.</p>
-            )
-          ) : (
-            back.data?.items.map((i) => (
-              <div
-                className="planning-item"
-                key={i.id}
-                draggable={can(project, "item", "update")}
-                onDragStart={(e) =>
-                  e.dataTransfer.setData(
-                    "text/plain",
-                    JSON.stringify({ id: i.id, version: i.version }),
-                  )
-                }
-              >
-                <div className="row">
-                  {can(project, "item", "update") && (
-                    <input
-                      type="checkbox"
-                      aria-label={"Select " + i.key}
-                      checked={!!selected[i.id]}
-                      onChange={() => toggle(i)}
-                    />
-                  )}
-                  <span className="key">{i.key}</span>
-                </div>
-                <h3>
-                  <ItemLink item={i} />
-                </h3>
-                <State state={i.state} />
-                <BlockerBadge item={i} />
-                {can(project, "item", "update") && (
-                  <span className="row">
-                    <button
-                      className="btn small ghost"
-                      onClick={() => setMoving([i])}
-                    >
-                      Move
-                    </button>
-                    <button
-                      className="btn ghost small"
-                      aria-label={"Move " + i.key + " up"}
-                      onClick={() =>
-                        w.execute(() => reorderItem(i, -1)).catch(() => {})
-                      }
-                    >
-                      ↑
-                    </button>
-                    <button
-                      className="btn ghost small"
-                      aria-label={"Move " + i.key + " down"}
-                      onClick={() =>
-                        w.execute(() => reorderItem(i, 1)).catch(() => {})
-                      }
-                    >
-                      ↓
-                    </button>
-                  </span>
-                )}
-              </div>
-            ))
-          )}
-          {back.data && <Pagination data={back.data} onChange={setOffset} />}
-        </section>
-        <div className="stack">
-          {sp.isPending ? (
-            can(project, "sprint") ? (
-              <Loading />
-            ) : (
-              <Empty title="Sprint access required" />
-            )
-          ) : sp.error ? (
-            <ErrorBox error={sp.error} />
-          ) : sp.data?.items.length ? (
-            sp.data.items.map((s, n) => (
-              <div
-                key={s.id}
-                onDragOver={(e) => {
-                  if (s.state !== "closed" && can(project, "item", "update"))
-                    e.preventDefault();
-                }}
-                onDrop={(e) => {
-                  e.preventDefault();
-                  if (s.state === "closed") return;
-                  try {
-                    const i = JSON.parse(e.dataTransfer.getData("text/plain"));
-                    w.execute(() =>
-                      api(`/projects/${id}/items/bulk-move`, {
-                        method: "POST",
-                        body: {
-                          item_versions: { [i.id]: i.version },
-                          sprint_id: s.id,
-                        },
-                      }),
-                    ).catch(() => {});
-                  } catch {}
-                }}
-              >
-                <SprintSection
-                  sprint={s}
-                  selected={new Set(Object.keys(selected))}
-                  onSelect={toggle}
-                  onEdit={() => setEdit(s)}
-                  onCloseSprint={() => setClose(s)}
-                  onStart={() => start(s).catch(() => {})}
-                  onMove={(i) => setMoving([i])}
-                  onCreate={() => setCreate(s.id)}
-                />
-                {can(project, "sprint", "update") &&
-                  sp.data.total === sp.data.items.length && (
-                    <div className="row">
-                      <button
-                        className="btn ghost small"
-                        disabled={!n}
-                        onClick={() => reorder(n, -1).catch(() => {})}
-                      >
-                        Move sprint up
-                      </button>
-                      <button
-                        className="btn ghost small"
-                        disabled={n === sp.data!.items.length - 1}
-                        onClick={() => reorder(n, 1).catch(() => {})}
-                      >
-                        Move sprint down
-                      </button>
-                    </div>
-                  )}
-              </div>
-            ))
-          ) : (
-            <Empty title="No sprints yet">
-              Create a sprint to group the next work.
-            </Empty>
-          )}
-          {sp.data && <Pagination data={sp.data} onChange={setSprintOffset} />}
-        </div>
-      </div>
-      {edit && (
-        <SprintEditor
-          projectId={id!}
-          sprint={edit === "new" ? undefined : edit}
-          onClose={() => setEdit(null)}
-        />
-      )}{" "}
-      {close && <CloseSprint sprint={close} onClose={() => setClose(null)} />}{" "}
-      {create !== null && (
-        <ItemEditor
-          projectId={id!}
-          sprintId={create}
-          onClose={() => setCreate(null)}
-        />
-      )}{" "}
-      {moving && (
-        <MoveDialog
-          items={moving}
-          onClose={() => {
-            setMoving(null);
-            setSelected({});
-          }}
-        />
-      )}
-    </>
-  );
-}
+export { default as Planning } from "./Planning";
 
 export function ItemList() {
   const [params, setParams] = useSearchParams();
@@ -744,15 +296,36 @@ export function ItemList() {
   const [extra, setExtra] = useState(true);
   const [moving, setMoving] = useState<Item[] | null>(null);
   const [selected, setSelected] = useState<Record<string, Item>>({});
-  const q = useData<Page<Item>>(
-    ["items", params.toString()],
-    "/items?" + params.toString(),
+  const [collapsed, setCollapsed] = useState<Set<string>>(() => new Set());
+  const hierarchy = params.get("view") === "hierarchy";
+  const queryParams = new URLSearchParams(params);
+  queryParams.delete("view");
+  const filterCount = queryParams.size - Number(queryParams.has("offset"));
+  const itemQuery = queryParams.toString();
+  const flat = useData<Page<Item>>(
+    ["items", itemQuery],
+    "/items?" + itemQuery,
+    !hierarchy,
   );
+  const tree = useData<HierarchyPage>(
+    ["item-hierarchy", itemQuery],
+    "/items/hierarchy?" + itemQuery,
+    hierarchy,
+  );
+  const q = hierarchy ? tree : flat;
+
+  function setView(view: "list" | "hierarchy") {
+    queryParams.delete("offset");
+    if (view === "hierarchy") queryParams.set("view", "hierarchy");
+    setParams(queryParams, { preventScrollReset: true });
+  }
+
   function filter(key: string, values: string[]) {
     const p = new URLSearchParams(params);
     p.delete(key);
     values.filter(Boolean).forEach((v) => p.append(key, v));
     p.delete("offset");
+    setCollapsed(new Set());
     setParams(p);
   }
   const selectedProject = projects.find(
@@ -787,6 +360,24 @@ export function ItemList() {
         }
       />
       <div className="filters">
+        <div className="item-view-switch" role="group" aria-label="Item view">
+          <button
+            className="btn small"
+            type="button"
+            aria-pressed={!hierarchy}
+            onClick={() => hierarchy && setView("list")}
+          >
+            List
+          </button>
+          <button
+            className="btn small"
+            type="button"
+            aria-pressed={hierarchy}
+            onClick={() => !hierarchy && setView("hierarchy")}
+          >
+            Hierarchy
+          </button>
+        </div>
         <input
           className="filter-input"
           type="search"
@@ -796,7 +387,7 @@ export function ItemList() {
           onChange={(e) => filter("q", [e.target.value])}
         />
         <button className="filter-chip" onClick={() => setFilters(!filters)}>
-          Filters {params.size > 0 && `(${params.size})`} ⌄
+          Filters {filterCount > 0 && `(${filterCount})`} ⌄
         </button>
         <button
           className="btn ghost small"
@@ -804,8 +395,14 @@ export function ItemList() {
         >
           Columns
         </button>
-        {params.size > 0 && (
-          <button className="btn ghost small" onClick={() => setParams({})}>
+        {filterCount > 0 && (
+          <button
+            className="btn ghost small"
+            onClick={() => {
+              setCollapsed(new Set());
+              setParams(hierarchy ? { view: "hierarchy" } : {});
+            }}
+          >
             Clear all
           </button>
         )}
@@ -833,6 +430,7 @@ export function ItemList() {
             />
             <Multi
               name="Types"
+              itemTypes
               value={params.getAll("type")}
               options={types.map((t) => [t, label(t)])}
               onChange={(v) => filter("type", v)}
@@ -964,7 +562,21 @@ export function ItemList() {
         ) : (
           <>
             <ItemTable
-              data={q.data!}
+              {...(hierarchy && tree.data
+                ? {
+                    items: tree.data.items,
+                    tree: {
+                      collapsed,
+                      onToggle: (id: string) =>
+                        setCollapsed((previous) => {
+                          const next = new Set(previous);
+                          if (next.has(id)) next.delete(id);
+                          else next.add(id);
+                          return next;
+                        }),
+                    },
+                  }
+                : { items: flat.data?.items ?? [] })}
               extra={extra}
               selected={new Set(Object.keys(selected))}
               onSelect={(i) => {
@@ -979,6 +591,7 @@ export function ItemList() {
             />
             <Pagination
               data={q.data!}
+              unit={hierarchy ? "at top level" : undefined}
               onChange={(o) => {
                 const p = new URLSearchParams(params);
                 p.set("offset", String(o));
@@ -1013,8 +626,10 @@ function Multi({
   value,
   options,
   onChange,
+  itemTypes = false,
 }: {
   name: string;
+  itemTypes?: boolean;
   value: string[];
   options: string[][];
   onChange: (v: string[]) => void;
@@ -1035,13 +650,117 @@ function Multi({
           </option>
         ))}
       </select>
+      {itemTypes && (
+        <span className="row type-filter-selection">
+          {value.map((type) => (
+            <ItemType key={type} type={type} />
+          ))}
+        </span>
+      )}
     </label>
+  );
+}
+
+function SprintOverview({
+  sprint,
+  canEdit,
+  onEdit,
+}: {
+  sprint: Sprint;
+  canEdit: boolean;
+  onEdit: () => void;
+}) {
+  const counts = sprint.counts;
+  const total = sprint.total ?? 0;
+  const done = counts?.done ?? 0;
+  const cancelled = counts?.cancelled ?? 0;
+  const percent = total ? Math.round(((done + cancelled) / total) * 100) : 0;
+  return (
+    <div className="sprint-overview section">
+      <section className="panel sprint-goal">
+        <div className="section-head">
+          <h2>Description</h2>
+          {canEdit && (
+            <button className="btn ghost small" onClick={onEdit}>
+              {sprint.description ? "Edit description" : "Add description"}
+            </button>
+          )}
+        </div>
+        {sprint.description ? (
+          <Markdown>{sprint.description}</Markdown>
+        ) : (
+          <p className="muted">
+            No description yet. Add the goal and context for this sprint.
+          </p>
+        )}
+      </section>
+      {counts ? (
+        <section className="panel">
+          <div className="section-head">
+            <h2>Item overview</h2>
+            <span className="small muted">{total} total items</span>
+          </div>
+          <div className="sprint-stat-grid">
+            {states.map((state) => (
+              <Link
+                className="sprint-stat"
+                key={state}
+                to={
+                  "/items?" +
+                  query({
+                    project_id: [sprint.project_id],
+                    sprint_id: [sprint.id],
+                    state: [state],
+                  })
+                }
+              >
+                <State state={state} />
+                <strong>{counts[state] ?? 0}</strong>
+                <span className="small muted">View items →</span>
+              </Link>
+            ))}
+          </div>
+          <div className="sprint-completion">
+            <div className="between">
+              <h3>{percent}% complete</h3>
+              <span className="small muted">
+                {done} Done · {cancelled} Cancelled · {total - done - cancelled}{" "}
+                remaining
+              </span>
+            </div>
+            <progress
+              max={Math.max(total, 1)}
+              value={done + cancelled}
+              aria-label="Sprint completion"
+            />
+            <p className="small muted">
+              Done and Cancelled items count toward sprint closure.
+            </p>
+          </div>
+        </section>
+      ) : (
+        <div className="callout">
+          Item view permission is required to see sprint statistics.
+        </div>
+      )}
+    </div>
   );
 }
 
 export function SprintBoard() {
   const { id, sprintId } = useParams();
-  const { project } = useWorkspace();
+  const { project, user } = useWorkspace();
+  const [params, setParams] = useSearchParams();
+  const view = params.get("view") === "board" ? "board" : "overview";
+  const cancelledLanePreference = `planner-hide-cancelled-lane:${user.id}`;
+  const [showCancelled, setShowCancelled] = useState(
+    () => localStorage.getItem(cancelledLanePreference) !== "1",
+  );
+  const lanes = showCancelled
+    ? states
+    : states.filter((state) => state !== "cancelled");
+  const [editing, setEditing] = useState(false);
+  const info = useData<Sprint>(["sprint", sprintId], `/sprints/${sprintId}`);
   const [offsets, setOffsets] = useState<Record<string, number>>({});
   const q = useData<{ sprint: Sprint; columns: Record<string, Page<Item>> }>(
     ["board", sprintId, offsets],
@@ -1051,6 +770,7 @@ export function SprintBoard() {
           Object.entries(offsets).map(([k, v]) => [k + "_offset", v]),
         ),
       ),
+    view === "board" && can(project, "item"),
   );
   const sp = useCollection<Sprint>(
     ["sprints", id],
@@ -1083,9 +803,10 @@ export function SprintBoard() {
       }),
     );
   }
-  if (q.isPending) return <Loading />;
-  if (q.error) return <ErrorBox error={q.error} />;
-  const sprint = q.data!.sprint;
+  if (info.isPending) return <Loading />;
+  if (info.error)
+    return <ErrorBox error={info.error} retry={() => info.refetch()} />;
+  const sprint = info.data!;
   return (
     <>
       <Heading
@@ -1103,7 +824,9 @@ export function SprintBoard() {
               className="btn"
               aria-label="Choose sprint"
               value={sprint.id}
-              onChange={(e) => nav(`/projects/${id}/sprints/${e.target.value}`)}
+              onChange={(e) =>
+                nav(`/projects/${id}/sprints/${e.target.value}?view=${view}`)
+              }
             >
               {sp.data?.items.map((s) => (
                 <option value={s.id} key={s.id}>
@@ -1111,6 +834,17 @@ export function SprintBoard() {
                 </option>
               ))}
             </select>
+            <Link
+              className="btn"
+              to={`/projects/${id}/planning?sprint=${sprint.id}`}
+            >
+              Plan sprint
+            </Link>
+            {can(project, "sprint", "update") && (
+              <button className="btn" onClick={() => setEditing(true)}>
+                Edit sprint
+              </button>
+            )}
             {can(project, "sprint", "update") && sprint.state === "active" && (
               <button className="btn primary" onClick={() => setClose(true)}>
                 Close sprint
@@ -1119,6 +853,7 @@ export function SprintBoard() {
             {can(project, "sprint", "update") && sprint.state === "planned" && (
               <button
                 className="btn primary"
+                disabled={w.busy || !!sprint.counts?.open_question}
                 onClick={async () => {
                   if (await ask("Start " + sprint.name + "?"))
                     w.execute(() =>
@@ -1135,6 +870,23 @@ export function SprintBoard() {
           </>
         }
       />
+      <SprintQuestionsNotice sprint={sprint} />
+      <nav className="tabs" aria-label="Sprint views">
+        {["overview", "board"].map((value) => (
+          <button
+            key={value}
+            className={"tab " + (view === value ? "active" : "")}
+            aria-current={view === value ? "page" : undefined}
+            onClick={() => {
+              const p = new URLSearchParams(params);
+              p.set("view", value);
+              setParams(p);
+            }}
+          >
+            {label(value)}
+          </button>
+        ))}
+      </nav>
       {!!w.error && <ErrorBox error={w.error} />}{" "}
       {sprint.state === "closed" && (
         <div className="callout">
@@ -1142,124 +894,172 @@ export function SprintBoard() {
         </div>
       )}
       <div className="between section">
-        <span className="small muted">
-          {sprint.total} items · {sprint.counts?.done || 0} Done ·{" "}
-          {sprint.counts?.cancelled || 0} Cancelled
-        </span>
-        {sprint.state !== "closed" && can(project, "item", "create") && (
-          <button className="btn small" onClick={() => setCreate(true)}>
-            + Create item
-          </button>
+        {sprint.counts && (
+          <span className="small muted">
+            {sprint.total} items · {sprint.counts.done || 0} Done ·{" "}
+            {sprint.counts.cancelled || 0} Cancelled
+          </span>
         )}
-      </div>
-      <div className="board-scroll section">
-        <div className="board">
-          {states.map((state) => (
-            <section
-              className="lane"
-              key={state}
-              aria-label={label(state)}
-              onDragOver={(e) => {
-                if (sprint.state !== "closed" && can(project, "item", "update"))
-                  e.preventDefault();
-              }}
-              onDrop={(e) => {
-                e.preventDefault();
-                const id = e.dataTransfer.getData("text/plain");
-                const item = Object.values(q.data!.columns)
-                  .flatMap((c) => c.items)
-                  .find((i) => i.id === id);
-                if (item && can(item, "item", "update"))
-                  change(item, state).catch(() => {});
-              }}
-            >
-              <div className="lane-head">
-                <State state={state} />
-                <span className="count">{q.data!.columns[state].total}</span>
-              </div>
-              {q.data!.columns[state].items.map((i) => (
-                <article
-                  className="work-card"
-                  key={i.id}
-                  draggable={
-                    sprint.state !== "closed" && can(i, "item", "update")
-                  }
-                  onDragStart={(e) =>
-                    e.dataTransfer.setData("text/plain", i.id)
-                  }
-                >
-                  <div className="between">
-                    <span className="key">{i.key}</span>
-                    <span className="badge">{label(i.type)}</span>
-                  </div>
-                  <h3>
-                    <ItemLink item={i} />
-                  </h3>
-                  <div className="row">
-                    {i.labels.slice(0, 2).map((l) => (
-                      <span className="label" key={l.id}>
-                        {l.name}
-                      </span>
-                    ))}
-                  </div>
-                  <BlockerBadge item={i} />
-                  <div className="card-foot">
-                    <span className={"priority " + i.priority}>
-                      {label(i.priority)}
-                    </span>
-                    <span
-                      className="avatar"
-                      aria-label={i.assignee?.display_name || "Unassigned"}
-                    >
-                      {i.assignee?.display_name.slice(0, 2) || "–"}
-                    </span>
-                  </div>
-                  {sprint.state !== "closed" && can(i, "item", "update") && (
-                    <select
-                      className="card-state"
-                      aria-label={"Change state of " + i.key}
-                      value={i.state}
-                      onChange={(e) =>
-                        change(i, e.target.value).catch(() => {})
-                      }
-                    >
-                      {states.map((s) => (
-                        <option value={s} key={s}>
-                          {label(s)}
-                        </option>
-                      ))}
-                    </select>
-                  )}
-                </article>
-              ))}
-              {q.data!.columns[state].offset > 0 && (
-                <button
-                  className="btn small ghost"
-                  onClick={() =>
-                    setOffsets((o) => ({
-                      ...o,
-                      [state]: Math.max(0, (o[state] || 0) - 50),
-                    }))
-                  }
-                >
-                  Previous
-                </button>
-              )}
-              {q.data!.columns[state].offset + q.data!.columns[state].limit <
-                q.data!.columns[state].total && (
-                <button
-                  className="btn small ghost"
-                  onClick={() =>
-                    setOffsets((o) => ({ ...o, [state]: (o[state] || 0) + 50 }))
-                  }
-                >
-                  Next 50
-                </button>
-              )}
-            </section>
-          ))}
+        <div className="row">
+          {view === "board" && can(project, "item") && (
+            <label className="check small">
+              <input
+                type="checkbox"
+                checked={showCancelled}
+                onChange={(e) => {
+                  const show = e.currentTarget.checked;
+                  if (show) localStorage.removeItem(cancelledLanePreference);
+                  else localStorage.setItem(cancelledLanePreference, "1");
+                  setShowCancelled(show);
+                }}
+              />
+              Show Cancelled lane
+            </label>
+          )}
+          {sprint.state !== "closed" && can(project, "item", "create") && (
+            <button className="btn small" onClick={() => setCreate(true)}>
+              + Create item
+            </button>
+          )}
         </div>
       </div>
+      {view === "overview" ? (
+        <SprintOverview
+          sprint={sprint}
+          canEdit={can(project, "sprint", "update")}
+          onEdit={() => setEditing(true)}
+        />
+      ) : !can(project, "item") ? (
+        <Empty title="Item access required">
+          You need item view permission to use the board.
+        </Empty>
+      ) : q.isPending ? (
+        <Loading />
+      ) : q.error ? (
+        <ErrorBox error={q.error} retry={() => q.refetch()} />
+      ) : (
+        <div className="board-scroll section">
+          <div className="board">
+            {lanes.map((state) => (
+              <section
+                className="lane"
+                key={state}
+                aria-label={label(state)}
+                onDragOver={(e) => {
+                  if (
+                    sprint.state !== "closed" &&
+                    can(project, "item", "update")
+                  )
+                    e.preventDefault();
+                }}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  const id = e.dataTransfer.getData("text/plain");
+                  const item = Object.values(q.data!.columns)
+                    .flatMap((c) => c.items)
+                    .find((i) => i.id === id);
+                  if (item && can(item, "item", "update"))
+                    change(item, state).catch(() => {});
+                }}
+              >
+                <div className="lane-head">
+                  <State state={state} />
+                  <span className="count">{q.data!.columns[state].total}</span>
+                </div>
+                {q.data!.columns[state].items.map((i) => (
+                  <article
+                    className="work-card"
+                    key={i.id}
+                    draggable={
+                      sprint.state !== "closed" && can(i, "item", "update")
+                    }
+                    onDragStart={(e) =>
+                      e.dataTransfer.setData("text/plain", i.id)
+                    }
+                  >
+                    <div className="between">
+                      <span className="key">{i.key}</span>
+                      <ItemType type={i.type} />
+                    </div>
+                    <h3>
+                      <ItemLink item={i} />
+                    </h3>
+                    <div className="row">
+                      {i.labels.slice(0, 2).map((l) => (
+                        <span className="label" key={l.id}>
+                          {l.name}
+                        </span>
+                      ))}
+                    </div>
+                    <BlockerBadge item={i} />
+                    <div className="card-foot">
+                      <span className={"priority " + i.priority}>
+                        {label(i.priority)}
+                      </span>
+                      <span
+                        className="avatar"
+                        aria-label={i.assignee?.display_name || "Unassigned"}
+                      >
+                        {i.assignee?.display_name.slice(0, 2) || "–"}
+                      </span>
+                    </div>
+                    {sprint.state !== "closed" && can(i, "item", "update") && (
+                      <select
+                        className="card-state"
+                        aria-label={"Change state of " + i.key}
+                        value={i.state}
+                        onChange={(e) =>
+                          change(i, e.target.value).catch(() => {})
+                        }
+                      >
+                        {itemStateOptions(i.state).map((s) => (
+                          <option value={s} key={s}>
+                            {label(s)}
+                          </option>
+                        ))}
+                      </select>
+                    )}
+                  </article>
+                ))}
+                {q.data!.columns[state].offset > 0 && (
+                  <button
+                    className="btn small ghost"
+                    onClick={() =>
+                      setOffsets((o) => ({
+                        ...o,
+                        [state]: Math.max(0, (o[state] || 0) - 50),
+                      }))
+                    }
+                  >
+                    Previous
+                  </button>
+                )}
+                {q.data!.columns[state].offset + q.data!.columns[state].limit <
+                  q.data!.columns[state].total && (
+                  <button
+                    className="btn small ghost"
+                    onClick={() =>
+                      setOffsets((o) => ({
+                        ...o,
+                        [state]: (o[state] || 0) + 50,
+                      }))
+                    }
+                  >
+                    Next 50
+                  </button>
+                )}
+              </section>
+            ))}
+          </div>
+        </div>
+      )}
+      {editing && (
+        <SprintEditor
+          projectId={id!}
+          sprint={sprint}
+          onClose={() => setEditing(false)}
+        />
+      )}
       {transition && (
         <StateDialog {...transition} onClose={() => setTransition(null)} />
       )}{" "}

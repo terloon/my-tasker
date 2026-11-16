@@ -5,6 +5,7 @@ import {
   Route,
   Routes,
   useLocation,
+  useMatch,
   useNavigate,
 } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
@@ -28,6 +29,7 @@ import {
   Workspace,
   useCollection,
   useData,
+  useItem,
   useWorkspace,
   useWrite,
 } from "./ui";
@@ -40,6 +42,8 @@ import {
 } from "./pages";
 import ItemDetail from "./ItemDetail";
 import { PasswordDialog, Permissions, Users } from "./admin";
+
+const itemDetailPath = "/projects/:id/items/:itemId";
 
 export const accentColors: Record<string, [string, string]> = {
   Blue: ["#1d4ed8", "#60a5fa"],
@@ -76,6 +80,9 @@ export default function App() {
   const [menu, setMenu] = useState(false);
   const nav = useNavigate();
   const location = useLocation();
+  const itemMatch = useMatch(itemDetailPath);
+  const item = useItem(itemMatch?.params.itemId, { observeOnly: true });
+  const currentItem = item.error ? undefined : item.data;
   const qc = useQueryClient();
   const me = useData<User>(["me"], "/auth/me", !!user);
   const projects = useCollection<Project>(
@@ -219,6 +226,8 @@ export default function App() {
                       ? "Project overview"
                       : "Home";
   const pid = project?.id;
+  const breadcrumbProject =
+    active === "Home" ? null : (currentItem?.project_name ?? project?.name);
   const links = [
     ["Home", "/", "⌂"],
     ["Project overview", pid ? "/projects/" + pid : "/", "▧"],
@@ -327,7 +336,7 @@ export default function App() {
         </aside>
         <div className="app-main">
           <header className="header">
-            <div className="row">
+            <div className="row header-context">
               <button
                 className="btn ghost mobile-menu"
                 aria-label="Toggle navigation"
@@ -336,8 +345,20 @@ export default function App() {
                 ☰
               </button>
               <div className="breadcrumb">
-                {project && active !== "Home" ? project.name + " / " : ""}
-                <strong>{active}</strong>
+                {breadcrumbProject && (
+                  <>
+                    <span
+                      className="breadcrumb-project"
+                      title={breadcrumbProject}
+                    >
+                      {breadcrumbProject}
+                    </span>
+                    <span aria-hidden="true">/</span>
+                  </>
+                )}
+                <strong className={currentItem ? "header-item-key" : undefined}>
+                  {currentItem?.key ?? active}
+                </strong>
               </div>
             </div>
             <div className="row header-account">
@@ -380,10 +401,7 @@ export default function App() {
                 element={<SprintBoard />}
               />
               <Route path="/items" element={<ItemList />} />
-              <Route
-                path="/projects/:id/items/:itemId"
-                element={<ItemDetail />}
-              />
+              <Route path={itemDetailPath} element={<ItemDetail />} />
               <Route path="/admin/users" element={<Users />} />
               <Route
                 path="/projects/:id/settings/permissions"
@@ -654,13 +672,11 @@ function Appearance() {
       <div className="panel theme-example">
         <h3>Preview</h3>
         <div className="row" style={{ margin: "16px 0" }}>
-          {["open", "in_progress", "blocked", "done", "cancelled"].map(
-            (state) => (
-              <span className={"state " + state} key={state}>
-                {state === "in_progress" ? "In progress" : label(state)}
-              </span>
-            ),
-          )}
+          {states.map((state) => (
+            <span className={"state " + state} key={state}>
+              {state === "in_progress" ? "In progress" : label(state)}
+            </span>
+          ))}
         </div>
         <button className="btn primary">Primary action</button>{" "}
         <button className="btn">Secondary action</button>
@@ -669,7 +685,7 @@ function Appearance() {
   );
 }
 
-import { label } from "./api/client";
+import { label, states } from "./api/client";
 function Account() {
   const { user, logout } = useWorkspace();
   const [password, setPassword] = useState(false);

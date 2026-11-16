@@ -26,7 +26,7 @@ metadata = MetaData(
         "pk": "pk_%(table_name)s",
     }
 )
-STATES = ("open", "in_progress", "blocked", "done", "cancelled")
+STATES = ("open", "open_question", "in_progress", "blocked", "done", "cancelled")
 TYPES = ("story", "task", "bug")
 PRIORITIES = ("none", "low", "medium", "high", "urgent")
 RESOURCES = ("project", "sprint", "item", "comment", "attachment")
@@ -125,6 +125,7 @@ sprints = Table(
     ident(),
     Column("project_id", String, ForeignKey("projects.id", ondelete="CASCADE"), nullable=False),
     Column("name", String, nullable=False),
+    Column("description", Text, nullable=False, default="", server_default=""),
     Column("position", Integer, nullable=False),
     Column("state", String, nullable=False, default="planned"),
     Column("started_at", String),

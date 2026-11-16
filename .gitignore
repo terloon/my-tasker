@@ -10,4 +10,5 @@ data/
 *.db-wal
 .env
 test-results/
-
+backups/
+docs/todo

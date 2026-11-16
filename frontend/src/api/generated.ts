@@ -403,8 +403,8 @@ export interface paths {
         delete: operations["delete_sprint_api_v1_sprints__sprint_id__delete"];
         options?: never;
         head?: never;
-        /** Rename Sprint */
-        patch: operations["rename_sprint_api_v1_sprints__sprint_id__patch"];
+        /** Update Sprint */
+        patch: operations["update_sprint_api_v1_sprints__sprint_id__patch"];
         trace?: never;
     };
     "/api/v1/sprints/{sprint_id}/start": {
@@ -484,6 +484,26 @@ export interface paths {
         };
         /** Items */
         get: operations["items_api_v1_items_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/items/hierarchy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Item Hierarchy
+         * @description Page by top-level items and return each branch in parent-first order.
+         */
+        get: operations["item_hierarchy_api_v1_items_hierarchy_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -917,6 +937,83 @@ export interface components {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
         };
+        /** HierarchyItem */
+        HierarchyItem: {
+            /** Id */
+            id: string;
+            /** Project Id */
+            project_id: string;
+            /** Key */
+            key: string;
+            /** Title */
+            title: string;
+            /** Description */
+            description: string;
+            /**
+             * Type
+             * @enum {string}
+             */
+            type: "story" | "task" | "bug";
+            /**
+             * State
+             * @enum {string}
+             */
+            state: "open" | "open_question" | "in_progress" | "blocked" | "done" | "cancelled";
+            /**
+             * Priority
+             * @enum {string}
+             */
+            priority: "none" | "low" | "medium" | "high" | "urgent";
+            /** Sprint Id */
+            sprint_id: string | null;
+            /** Sprint Name */
+            sprint_name: string;
+            /** Sprint State */
+            sprint_state: string | null;
+            /** Assignee Id */
+            assignee_id: string | null;
+            assignee: components["schemas"]["UserOut"] | null;
+            /** Labels */
+            labels: components["schemas"]["LabelOut"][];
+            /** Label Ids */
+            label_ids: string[];
+            blocker_summary: components["schemas"]["BlockerSummary"];
+            /** Permissions */
+            permissions: {
+                [key: string]: {
+                    [key: string]: boolean;
+                };
+            };
+            /** Version */
+            version: number;
+            /** Created At */
+            created_at: string;
+            /** Updated At */
+            updated_at: string;
+            /** Parent Id */
+            parent_id: string | null;
+            /** Depth */
+            depth: number;
+            /** Has Children */
+            has_children: boolean;
+            /** Matches Filters */
+            matches_filters: boolean;
+        } & {
+            [key: string]: unknown;
+        };
+        /** HierarchyPage */
+        HierarchyPage: {
+            /** Items */
+            items: components["schemas"]["HierarchyItem"][];
+            /** Total */
+            total: number;
+            /** Offset */
+            offset: number;
+            /** Limit */
+            limit: number;
+        } & {
+            [key: string]: unknown;
+        };
         /** ItemCreate */
         ItemCreate: {
             /** Title */
@@ -936,7 +1033,7 @@ export interface components {
              * @default open
              * @enum {string}
              */
-            state: "open" | "in_progress" | "blocked" | "done" | "cancelled";
+            state: "open" | "open_question" | "in_progress" | "blocked" | "done" | "cancelled";
             /**
              * Priority
              * @default none
@@ -973,7 +1070,7 @@ export interface components {
              * State
              * @enum {string}
              */
-            state: "open" | "in_progress" | "blocked" | "done" | "cancelled";
+            state: "open" | "open_question" | "in_progress" | "blocked" | "done" | "cancelled";
             /**
              * Priority
              * @enum {string}
@@ -1030,7 +1127,7 @@ export interface components {
             /** Description */
             description?: string | null;
             /** State */
-            state?: ("open" | "in_progress" | "blocked" | "done" | "cancelled") | null;
+            state?: ("open" | "open_question" | "in_progress" | "blocked" | "done" | "cancelled") | null;
             /** Priority */
             priority?: ("none" | "low" | "medium" | "high" | "urgent") | null;
             /** Assignee Id */
@@ -1166,6 +1263,16 @@ export interface components {
             /** Blocker Revision */
             blocker_revision: string;
         };
+        /** SprintCreate */
+        SprintCreate: {
+            /** Name */
+            name: string;
+            /**
+             * Description
+             * @default
+             */
+            description: string;
+        };
         /** SprintOut */
         SprintOut: {
             /** Id */
@@ -1174,6 +1281,8 @@ export interface components {
             project_id: string;
             /** Name */
             name: string;
+            /** Description */
+            description: string;
             /**
              * State
              * @enum {string}
@@ -1195,6 +1304,13 @@ export interface components {
             total?: number | null;
         } & {
             [key: string]: unknown;
+        };
+        /** SprintPatch */
+        SprintPatch: {
+            /** Name */
+            name?: string | null;
+            /** Description */
+            description?: string | null;
         };
         /** UserCreate */
         UserCreate: {
@@ -2180,7 +2296,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["Name"];
+                "application/json": components["schemas"]["SprintCreate"];
             };
         };
         responses: {
@@ -2339,7 +2455,7 @@ export interface operations {
             };
         };
     };
-    rename_sprint_api_v1_sprints__sprint_id__patch: {
+    update_sprint_api_v1_sprints__sprint_id__patch: {
         parameters: {
             query?: never;
             header: {
@@ -2354,7 +2470,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["Name"];
+                "application/json": components["schemas"]["SprintPatch"];
             };
         };
         responses: {
@@ -2492,6 +2608,7 @@ export interface operations {
                 blocked_offset?: number;
                 done_offset?: number;
                 cancelled_offset?: number;
+                open_question_offset?: number;
             };
             header?: never;
             path: {
@@ -2527,7 +2644,7 @@ export interface operations {
                 project_id?: string[];
                 sprint_id?: string[];
                 type?: ("story" | "task" | "bug")[];
-                state?: ("open" | "in_progress" | "blocked" | "done" | "cancelled")[];
+                state?: ("open" | "open_question" | "in_progress" | "blocked" | "done" | "cancelled")[];
                 assignee_id?: string[];
                 label_id?: string[];
                 priority?: ("none" | "low" | "medium" | "high" | "urgent")[];
@@ -2556,6 +2673,54 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ItemPage"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    item_hierarchy_api_v1_items_hierarchy_get: {
+        parameters: {
+            query?: {
+                project_id?: string[];
+                sprint_id?: string[];
+                type?: ("story" | "task" | "bug")[];
+                state?: ("open" | "open_question" | "in_progress" | "blocked" | "done" | "cancelled")[];
+                assignee_id?: string[];
+                label_id?: string[];
+                priority?: ("none" | "low" | "medium" | "high" | "urgent")[];
+                backlog?: boolean;
+                unassigned?: boolean;
+                q?: string | null;
+                updated_since?: string | null;
+                blocked_by_item_id?: string | null;
+                blocks_item_id?: string | null;
+                ready_to_resume?: boolean;
+                sort?: "key" | "title" | "priority" | "state" | "created_at" | "updated_at" | "rank";
+                direction?: "asc" | "desc";
+                offset?: number;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HierarchyPage"];
                 };
             };
             /** @description Validation Error */

@@ -1,3 +1,5 @@
+import { ItemType } from "./ItemType";
+import { visibleHierarchyItems } from "./item-hierarchy";
 import {
   createContext,
   useContext,
@@ -15,10 +17,12 @@ import {
   can,
   label,
   when,
+  type HierarchyItem,
   type Item,
   type Page,
   type Event as ActivityEvent,
   type Project,
+  type Sprint,
   type User,
 } from "./api/client";
 
@@ -119,6 +123,14 @@ export function useData<T>(
       !(e instanceof ApiError && [401, 403, 404].includes(e.status)) && n < 1,
   });
 }
+export function useItem(itemId?: string, { observeOnly = false } = {}) {
+  return useData<Item>(
+    ["item", itemId],
+    `/items/${itemId}`,
+    !!itemId && !observeOnly,
+    !observeOnly,
+  );
+}
 export function useCollection<T>(key: unknown[], path: string, enabled = true) {
   return useQuery<Page<T>>({
     queryKey: key,
@@ -208,6 +220,15 @@ export function Heading({
 export function State({ state }: { state: string }) {
   return <span className={"state " + state}>{label(state)}</span>;
 }
+export function SprintQuestionsNotice({ sprint }: { sprint: Sprint }) {
+  const count = sprint.counts?.open_question ?? 0;
+  return sprint.state === "planned" && count > 0 ? (
+    <p className="callout warning sprint-questions-notice" role="status">
+      {count === 1 ? "1 item has" : `${count} items have`} open questions.
+      Return {count === 1 ? "it" : "them"} to Open before starting this sprint.
+    </p>
+  ) : null;
+}
 export function Person({
   user,
 }: {
@@ -243,29 +264,44 @@ export function BlockerBadge({ item }: { item: Item }) {
     </>
   ) : null;
 }
-export function ItemLink({ item }: { item: Item }) {
+export function ItemLink({
+  item,
+  planningSearch,
+}: {
+  item: Item;
+  planningSearch?: string;
+}) {
   return (
     <Link
       className="item-title"
       to={`/projects/${item.project_id}/items/${item.id}`}
+      state={planningSearch === undefined ? undefined : { planningSearch }}
     >
       {item.title}
     </Link>
   );
 }
-export function ItemTable({
-  data,
-  extra,
-  selected,
-  onSelect,
-  onState,
-}: {
-  data: Page<Item>;
+type ItemTableProps = {
   extra?: boolean;
   selected?: Set<string>;
   onSelect?: (item: Item) => void;
   onState?: (item: Item) => ReactNode;
-}) {
+} & (
+  | { items: Item[]; tree?: undefined }
+  | {
+      items: HierarchyItem[];
+      tree: { collapsed: ReadonlySet<string>; onToggle: (id: string) => void };
+    }
+);
+
+export function ItemTable(props: ItemTableProps) {
+  const { extra, selected, onSelect, onState, tree } = props;
+  const rows = props.tree
+    ? visibleHierarchyItems(props.items, props.tree.collapsed).map((item) => ({
+        item,
+        branch: item,
+      }))
+    : props.items.map((item) => ({ item, branch: null }));
   return (
     <div className="panel flush table-wrap">
       <table className="table">
@@ -273,7 +309,8 @@ export function ItemTable({
           <tr>
             {onSelect && <th>Select</th>}
             <th>Key</th>
-            <th>Title / type</th>
+            <th>Title</th>
+            <th scope="col">Type</th>
             <th>State</th>
             <th>Priority</th>
             <th>Assignee</th>
@@ -288,64 +325,106 @@ export function ItemTable({
           </tr>
         </thead>
         <tbody>
-          {data.items.map((i) => (
-            <tr
-              key={i.id}
-              draggable={!!onSelect && can(i, "item", "update")}
-              onDragStart={(e) =>
-                e.dataTransfer.setData(
-                  "text/plain",
-                  JSON.stringify({ id: i.id, version: i.version }),
-                )
-              }
-            >
-              {onSelect && (
-                <td>
-                  <input
-                    disabled={!can(i, "item", "update")}
-                    type="checkbox"
-                    aria-label={`Select ${i.key}`}
-                    checked={selected?.has(i.id) || false}
-                    onChange={() => onSelect(i)}
-                  />
-                </td>
-              )}
-              <td className="key">{i.key}</td>
-              <td className="title-cell">
-                <ItemLink item={i} />{" "}
-                <span className="badge">{label(i.type)}</span>
-                <BlockerBadge item={i} />
-              </td>
-              <td>
-                <State state={i.state} />
-              </td>
-              <td>
-                <span className={"priority " + i.priority}>
-                  {label(i.priority)}
-                </span>
-              </td>
-              <td>
-                <Person user={i.assignee} />
-              </td>
-              {extra && (
-                <>
-                  <td>{i.sprint_name}</td>
+          {rows.map(({ item: i, branch }) => {
+            const editable =
+              can(i, "item", "update") && (branch?.matches_filters ?? true);
+            const title = (
+              <>
+                <ItemLink item={i} /> <BlockerBadge item={i} />
+              </>
+            );
+            const expanded = !tree?.collapsed.has(i.id);
+            return (
+              <tr
+                key={i.id}
+                draggable={!!onSelect && editable}
+                onDragStart={(e) =>
+                  e.dataTransfer.setData(
+                    "text/plain",
+                    JSON.stringify({ id: i.id, version: i.version }),
+                  )
+                }
+              >
+                {onSelect && (
                   <td>
-                    {i.labels.map((l) => (
-                      <span key={l.id} className="label">
-                        {l.name}
-                      </span>
-                    ))}
+                    <input
+                      disabled={!editable}
+                      type="checkbox"
+                      aria-label={`Select ${i.key}`}
+                      checked={selected?.has(i.id) || false}
+                      onChange={() => onSelect(i)}
+                    />
                   </td>
-                  <td className="small nowrap">{when(i.updated_at)}</td>
-                </>
-              )}
-              {onState && <td>{onState(i)}</td>}
-            </tr>
-          ))}
+                )}
+                <td className="key">{i.key}</td>
+                <td className="title-cell">
+                  {branch ? (
+                    <div
+                      className="hierarchy-title"
+                      style={{
+                        paddingInlineStart: `${Math.min(branch.depth, 8) * 1.15}rem`,
+                      }}
+                    >
+                      {branch.has_children ? (
+                        <button
+                          className="hierarchy-toggle"
+                          type="button"
+                          aria-label={`${expanded ? "Collapse" : "Expand"} ${i.key}`}
+                          aria-expanded={expanded}
+                          onClick={() => tree?.onToggle(i.id)}
+                        >
+                          <span aria-hidden="true">{expanded ? "▾" : "▸"}</span>
+                        </button>
+                      ) : (
+                        <span className="hierarchy-toggle-space" />
+                      )}
+                      <div>
+                        {title}
+                        {!branch.matches_filters && (
+                          <span className="small muted hierarchy-context">
+                            Outside filters
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  ) : (
+                    title
+                  )}
+                </td>
+                <td className="item-type-cell">
+                  <ItemType type={i.type} />
+                </td>
+                <td>
+                  <State state={i.state} />
+                </td>
+                <td>
+                  <span className={"priority " + i.priority}>
+                    {label(i.priority)}
+                  </span>
+                </td>
+                <td>
+                  <Person user={i.assignee} />
+                </td>
+                {extra && (
+                  <>
+                    <td className="item-sprint-cell">{i.sprint_name}</td>
+                    <td>
+                      {i.labels.map((l) => (
+                        <span key={l.id} className="label">
+                          {l.name}
+                        </span>
+                      ))}
+                    </td>
+                    <td className="small nowrap">{when(i.updated_at)}</td>
+                  </>
+                )}
+                {onState && <td>{onState(i)}</td>}
+              </tr>
+            );
+          })}
         </tbody>
       </table>
-      {!data.items.length && (
+      {!props.items.length && (
         <Empty title="No items">No work matches this view.</Empty>
       )}
     </div>
@@ -354,14 +433,16 @@ export function ItemTable({
 export function Pagination({
   data,
   onChange,
+  unit = "total",
 }: {
   data: Page<unknown>;
   onChange: (offset: number) => void;
+  unit?: string;
 }) {
   return (
     <div className="footer-row">
       <span>
-        {data.total} total · {data.total ? data.offset + 1 : 0}–
+        {data.total} {unit} · {data.total ? data.offset + 1 : 0}–
         {Math.min(data.offset + data.limit, data.total)}
       </span>
       <div className="row">

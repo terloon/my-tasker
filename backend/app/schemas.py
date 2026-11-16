@@ -3,7 +3,7 @@ from typing import Annotated, Literal
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 Title = Annotated[str, Field(min_length=1, max_length=300)]
-State = Literal["open", "in_progress", "blocked", "done", "cancelled"]
+State = Literal["open", "open_question", "in_progress", "blocked", "done", "cancelled"]
 ItemType = Literal["story", "task", "bug"]
 Priority = Literal["none", "low", "medium", "high", "urgent"]
 
@@ -71,6 +71,16 @@ class ProjectPatch(Input):
 
 class Name(Input):
     name: Title
+
+
+class SprintCreate(Input):
+    name: Title
+    description: str = Field(default="", max_length=100000)
+
+
+class SprintPatch(Input):
+    name: Title | None = None
+    description: str | None = Field(default=None, max_length=100000)
 
 
 class Grant(Input):
@@ -246,6 +256,7 @@ class SprintOut(Output):
     id: str
     project_id: str
     name: str
+    description: str
     state: Literal["planned", "active", "closed"]
     position: int
     started_at: str | None
@@ -260,3 +271,14 @@ class ItemPage(Output):
     total: int
     offset: int
     limit: int
+
+
+class HierarchyItem(ItemOut):
+    parent_id: str | None
+    depth: int
+    has_children: bool
+    matches_filters: bool
+
+
+class HierarchyPage(ItemPage):
+    items: list[HierarchyItem]

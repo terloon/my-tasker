@@ -1,3 +1,4 @@
+from collections import defaultdict
 from datetime import UTC, datetime
 
 from sqlalchemy import delete, func, insert, or_, select, update
@@ -178,6 +179,7 @@ class WorkService(Service):
         item = self.item(item_id, "update")
         check_version(item, expected)
         data = dict(data)
+        self.check_question_transition(item, data.get("state", item["state"]))
         require(
             data.get("state") != "cancelled",
             409,
@@ -220,14 +222,15 @@ class WorkService(Service):
         )
         return self.item_out(item)
 
-    def query_items(self, query=None):
+    def query_items(self, query=None, *, hierarchy=False):
         q = query or {}
 
         def values(key):
             value = q.get(key, [])
             return value if isinstance(value, list) else [value]
 
-        rows = [r for r in self.rows(m.items) if self.can(r["project_id"], "item")]
+        visible = [r for r in self.rows(m.items) if self.can(r["project_id"], "item")]
+        rows = visible
         for key in ("project_id", "type", "state", "priority"):
             vals = values(key)
             if vals:
@@ -341,9 +344,60 @@ class WorkService(Service):
             )
             return val, r["id"]
 
-        rows.sort(key=order, reverse=q.get("direction", "desc") == "desc")
-        result = page(rows, q.get("offset", 0), q.get("limit", 50))
+        reverse = q.get("direction", "desc") == "desc"
+        offset, limit = q.get("offset", 0), q.get("limit", 50)
+        if hierarchy:
+            return self.item_hierarchy(visible, rows, order, reverse, offset, limit)
+        result = page(sorted(rows, key=order, reverse=reverse), offset, limit)
         result["items"] = [self.item_out(i) for i in result["items"]]
+        return result
+
+    def item_hierarchy(self, visible, matches, order, reverse, offset, limit):
+        if not matches:
+            return page([], offset, limit)
+        visible_by_id = {item["id"]: item for item in visible}
+        project_ids = {item["project_id"] for item in matches}
+        parents = {
+            child_id: parent_id
+            for child_id, parent_id in self.c.execute(
+                select(m.links.c.target_id, m.links.c.source_id).where(
+                    m.links.c.kind == "parent_child",
+                    m.links.c.project_id.in_(project_ids),
+                )
+            )
+        }
+        match_ids = {item["id"] for item in matches}
+        included = set()
+        for item_id in match_ids:
+            while item_id in visible_by_id and item_id not in included:
+                included.add(item_id)
+                item_id = parents.get(item_id)
+
+        children = defaultdict(list)
+        for item in sorted(
+            (visible_by_id[item_id] for item_id in included), key=order, reverse=reverse
+        ):
+            parent_id = parents.get(item["id"])
+            children[parent_id if parent_id in included else None].append(item)
+
+        result = page(children[None], offset, limit)
+        pending = [(item, None, 0) for item in reversed(result["items"])]
+        items = []
+        while pending:
+            item, parent_id, depth = pending.pop()
+            item_id = item["id"]
+            branch = children.get(item_id, [])
+            items.append(
+                {
+                    **self.item_out(item),
+                    "parent_id": parent_id,
+                    "depth": depth,
+                    "has_children": bool(branch),
+                    "matches_filters": item_id in match_ids,
+                }
+            )
+            pending.extend((child, item_id, depth + 1) for child in reversed(branch))
+        result["items"] = items
         return result
 
     def add_link(self, item_id, relationship, target_id, expected, target_expected, internal=False):
@@ -549,9 +603,18 @@ class WorkService(Service):
             ),
         }
 
+    def check_question_transition(self, item, target):
+        require(
+            item["state"] != "open_question" or target in ("open_question", "open"),
+            409,
+            "question_must_return_to_open",
+            "Return this item to Open before changing it to another state.",
+        )
+
     def cancel_item(self, item_id, expected, impact_revision, confirm_blocker_removal=False):
         item = self.item(item_id, "update")
         check_version(item, expected)
+        self.check_question_transition(item, "cancelled")
         self.ensure_not_closed(item)
         impact = self.impact(item_id)
         require(
@@ -739,7 +802,7 @@ class WorkService(Service):
             [self.sprint_out(s) for s in rows if not state or s["state"] == state], offset, limit
         )
 
-    def create_sprint(self, project_id, name):
+    def create_sprint(self, project_id, name, description=""):
         self.access(project_id, "sprint", "create")
         position = (
             self.c.scalar(
@@ -751,6 +814,7 @@ class WorkService(Service):
             id=uid(),
             project_id=project_id,
             name=name,
+            description=description,
             position=position,
             state="planned",
             started_at=None,
@@ -761,22 +825,33 @@ class WorkService(Service):
         )
         self.c.execute(insert(m.sprints).values(**sprint))
         self.record(
-            project_id, None, "sprint_created", sprint["id"], {"name": name}, resource="sprint"
+            project_id,
+            None,
+            "sprint_created",
+            sprint["id"],
+            {"name": name, "description": description},
+            resource="sprint",
         )
         return self.sprint_out(sprint)
 
-    def update_sprint(self, sprint_id, name, expected):
+    def update_sprint(self, sprint_id, changes, expected):
         sprint = self.sprint(sprint_id, "update")
         check_version(sprint, expected)
+        require(bool(changes), 422, "empty_update", "Provide a name or description to update.")
+        changed = self.touch(m.sprints, sprint, changes)
         self.record(
             sprint["project_id"],
             None,
-            "sprint_renamed",
+            "sprint_updated",
             sprint_id,
-            {"name": {"from": sprint["name"], "to": name}},
+            {
+                key: {"from": sprint[key], "to": value}
+                for key, value in changes.items()
+                if sprint[key] != value
+            },
             resource="sprint",
         )
-        return self.sprint_out(self.touch(m.sprints, sprint, {"name": name}))
+        return self.sprint_out(changed)
 
     def start_sprint(self, sprint_id, expected):
         sprint = self.sprint(sprint_id, "update")
@@ -797,6 +872,26 @@ class WorkService(Service):
             "active_sprint_exists",
             "This project already has an active sprint.",
         )
+        question_count = self.c.scalar(
+            select(func.count())
+            .select_from(m.items)
+            .where(
+                m.items.c.project_id == sprint["project_id"],
+                m.items.c.sprint_id == sprint_id,
+                m.items.c.state == "open_question",
+            )
+        )
+        if question_count:
+            can_view_items = self.can(sprint["project_id"], "item")
+            require(
+                False,
+                409,
+                "sprint_open_questions",
+                "Return items with open questions to Open before starting this sprint."
+                if can_view_items
+                else "This sprint has open questions. Ask someone with item access to review them.",
+                {"count": question_count} if can_view_items else {},
+            )
         result = self.touch(m.sprints, sprint, {"state": "active", "started_at": now()})
         self.record(
             sprint["project_id"],

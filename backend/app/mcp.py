@@ -210,14 +210,27 @@ def create_mcp(engine, settings):
     )
     register(
         "create_sprint",
-        {"project_id": ID, "name": (s.Title, ...)},
-        lambda service, a: service.create_sprint(a.project_id, a.name),
+        {
+            "project_id": ID,
+            "name": (s.Title, ...),
+            "description": (str, Field(default="", max_length=100000)),
+        },
+        lambda service, a: service.create_sprint(a.project_id, a.name, a.description),
         True,
     )
     register(
         "update_sprint",
-        {"sprint_id": ID, "expected_version": VER, "name": (s.Title, ...)},
-        lambda service, a: service.update_sprint(a.sprint_id, a.name, a.expected_version),
+        {
+            "sprint_id": ID,
+            "expected_version": VER,
+            "name": (s.Title | None, None),
+            "description": (str | None, Field(default=None, max_length=100000)),
+        },
+        lambda service, a: service.update_sprint(
+            a.sprint_id,
+            {key: getattr(a, key) for key in ("name", "description") if key in a.model_fields_set},
+            a.expected_version,
+        ),
         True,
     )
     register(

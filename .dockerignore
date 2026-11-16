@@ -13,3 +13,5 @@ frontend/dist
 docs/design
 test-results
 
+
+backups/
