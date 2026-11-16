@@ -1,4 +1,6 @@
-import { TypeSelect } from "./ItemType";
+import { Button } from "./controls";
+import { TypeIcon } from "./ItemType";
+import SelectField from "./SelectField";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -59,22 +61,24 @@ export function ProjectEditor({
       onClose={onClose}
       dirty={
         name !== (project?.name || "") ||
+        key !== (project?.key || "") ||
         description !== (project?.description || "")
       }
-      footer={
+      dismissible={!w.busy}
+      footer={(requestClose) => (
         <>
-          <button className="btn" onClick={onClose}>
+          <Button className="btn" onClick={requestClose} disabled={w.busy}>
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
             className="btn primary"
             disabled={w.busy || !name.trim() || (!project && !key.trim())}
             onClick={() => save().catch(() => {})}
           >
             {w.busy ? "Saving…" : project ? "Save changes" : "Create project"}
-          </button>
+          </Button>
         </>
-      }
+      )}
     >
       <div className="stack">
         {!!w.error && <ErrorBox error={w.error} />}
@@ -128,12 +132,13 @@ export function SprintEditor({
         name !== (sprint?.name || "") ||
         description !== (sprint?.description || "")
       }
-      footer={
+      dismissible={!w.busy}
+      footer={(requestClose) => (
         <>
-          <button className="btn" onClick={onClose}>
+          <Button className="btn" onClick={requestClose} disabled={w.busy}>
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
             className="btn primary"
             disabled={!name.trim() || w.busy}
             onClick={() =>
@@ -156,9 +161,9 @@ export function SprintEditor({
             }
           >
             {w.busy ? "Saving…" : sprint ? "Save changes" : "Create sprint"}
-          </button>
+          </Button>
         </>
-      }
+      )}
     >
       <div className="stack">
         {!!w.error && <ErrorBox error={w.error} />}
@@ -259,13 +264,25 @@ export function ItemEditor({
       title="Create item"
       onClose={onClose}
       wide
-      dirty={!!title || !!description}
-      footer={
+      dirty={Boolean(
+        title ||
+        description ||
+        pid !== projectId ||
+        type !== "task" ||
+        state !== "open" ||
+        priority !== "none" ||
+        assignee ||
+        sprint !== (sprintId || "") ||
+        labels.length ||
+        blockers.length,
+      )}
+      dismissible={!w.busy}
+      footer={(requestClose) => (
         <>
-          <button className="btn" onClick={onClose}>
+          <Button className="btn" onClick={requestClose} disabled={w.busy}>
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
             className="btn primary"
             disabled={
               w.busy ||
@@ -276,55 +293,47 @@ export function ItemEditor({
             onClick={() => save().catch(() => {})}
           >
             {w.busy ? "Creating…" : "Create and open"}
-          </button>
+          </Button>
         </>
-      }
+      )}
     >
       <div className="stack">
         {!!w.error && <ErrorBox error={w.error} />}
-        <Field name="Project">
-          <select
-            value={pid}
-            onChange={(e) => {
-              setPid(e.target.value);
-              setSprint("");
-              setLabels([]);
-              setAssignee("");
-              setBlockers([]);
-            }}
-          >
-            {projects
-              .filter((p) => can(p, "item", "create"))
-              .map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.name}
-                </option>
-              ))}
-          </select>
-        </Field>
+        <SelectField
+          title="Project"
+          value={pid}
+          options={projects
+            .filter((p) => can(p, "item", "create"))
+            .map((p) => ({ value: p.id, label: p.name }))}
+          onChange={(next) => {
+            setPid(next);
+            setSprint("");
+            setLabels([]);
+            setAssignee("");
+            setBlockers([]);
+          }}
+        />
         <div className="two-fields">
-          <Field name="Type">
-            <TypeSelect value={type} onChange={(e) => setType(e.target.value)}>
-              {types.map((t) => (
-                <option key={t} value={t}>
-                  {label(t)}
-                </option>
-              ))}
-            </TypeSelect>
-          </Field>
-          <Field name="State">
-            <select value={state} onChange={(e) => setState(e.target.value)}>
-              {states.map((s) => (
-                <option
-                  key={s}
-                  value={s}
-                  disabled={s === "blocked" && !can(selected, "item", "update")}
-                >
-                  {label(s)}
-                </option>
-              ))}
-            </select>
-          </Field>
+          <SelectField
+            title="Type"
+            value={type}
+            onChange={setType}
+            options={types.map((t) => ({
+              value: t,
+              label: label(t),
+              icon: <TypeIcon type={t} />,
+            }))}
+          />
+          <SelectField
+            title="State"
+            value={state}
+            onChange={setState}
+            options={states.map((s) => ({
+              value: s,
+              label: label(s),
+              disabled: s === "blocked" && !can(selected, "item", "update"),
+            }))}
+          />
         </div>
         <Field name="Title *">
           <input
@@ -354,59 +363,50 @@ export function ItemEditor({
           </div>
         )}
         <div className="two-fields">
-          <Field name="Sprint">
-            <select value={sprint} onChange={(e) => setSprint(e.target.value)}>
-              <option value="">Backlog</option>
-              {sp.data?.items
+          <SelectField
+            title="Sprint"
+            value={sprint}
+            onChange={setSprint}
+            unavailableLabel={
+              sp.isFetching ? "Loading sprint…" : "Selected sprint"
+            }
+            options={[
+              { value: "", label: "Backlog" },
+              ...(sp.data?.items
                 .filter((s) => s.state !== "closed")
-                .map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.name}
-                  </option>
-                ))}
-            </select>
-          </Field>
-          <Field name="Assignee">
-            <select
-              value={assignee}
-              onChange={(e) => setAssignee(e.target.value)}
-            >
-              <option value="">Unassigned</option>
-              {users.data?.map((u) => (
-                <option key={u.id} value={u.id}>
-                  {u.display_name}
-                  {u.kind === "agent" ? " · Agent" : ""}
-                </option>
-              ))}
-            </select>
-          </Field>
-          <Field name="Priority">
-            <select
-              value={priority}
-              onChange={(e) => setPriority(e.target.value)}
-            >
-              {priorities.map((s) => (
-                <option key={s} value={s}>
-                  {label(s)}
-                </option>
-              ))}
-            </select>
-          </Field>
-          <Field name="Labels">
-            <select
-              multiple
-              value={labels}
-              onChange={(e) =>
-                setLabels([...e.target.selectedOptions].map((o) => o.value))
-              }
-            >
-              {ls.data?.map((l) => (
-                <option key={l.id} value={l.id}>
-                  {l.name}
-                </option>
-              ))}
-            </select>
-          </Field>
+                .map((s) => ({ value: s.id, label: s.name })) ?? []),
+            ]}
+          />
+          <SelectField
+            title="Assignee"
+            value={assignee}
+            onChange={setAssignee}
+            unavailableLabel="Unavailable assignee"
+            options={[
+              { value: "", label: "Unassigned" },
+              ...(users.data?.map((u) => ({
+                value: u.id,
+                label: u.display_name + (u.kind === "agent" ? " · Agent" : ""),
+              })) ?? []),
+            ]}
+          />
+          <SelectField
+            title="Priority"
+            value={priority}
+            onChange={setPriority}
+            options={priorities.map((p) => ({ value: p, label: label(p) }))}
+          />
+          <SelectField
+            title="Labels"
+            emptyLabel="No labels selected"
+            value={labels}
+            onChange={setLabels}
+            multiple
+            unavailableLabel="Unavailable label"
+            options={
+              ls.data?.map((l) => ({ value: l.id, label: l.name })) ?? []
+            }
+          />
         </div>
       </div>
     </Modal>
@@ -488,10 +488,10 @@ export function MoveDialog({
       onClose={onClose}
       footer={
         <>
-          <button className="btn" onClick={onClose}>
+          <Button className="btn" onClick={onClose}>
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
             className="btn primary"
             disabled={w.busy}
             onClick={() =>
@@ -524,27 +524,23 @@ export function MoveDialog({
             }
           >
             {reopen ? "Move and reopen" : "Move items"}
-          </button>
+          </Button>
         </>
       }
     >
       <div className="stack">
         {!!w.error && <ErrorBox error={w.error} />}
-        <Field name="Destination">
-          <select
-            value={destination}
-            onChange={(e) => setDestination(e.target.value)}
-          >
-            <option value="">Backlog</option>
-            {sp.data?.items
+        <SelectField
+          title="Destination"
+          value={destination}
+          onChange={setDestination}
+          options={[
+            { value: "", label: "Backlog" },
+            ...(sp.data?.items
               .filter((s) => s.state !== "closed")
-              .map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.name}
-                </option>
-              ))}
-          </select>
-        </Field>
+              .map((s) => ({ value: s.id, label: s.name })) ?? []),
+          ]}
+        />
         <p>
           {reopen
             ? `The item will change to ${label(reopen)} and move out of its closed sprint together.`
@@ -611,10 +607,10 @@ export function StateDialog({
       wide={target === "blocked" || !!impact.data?.affected_items.length}
       footer={
         <>
-          <button className="btn" onClick={onClose}>
+          <Button className="btn" onClick={onClose}>
             Keep item unchanged
-          </button>
-          <button
+          </Button>
+          <Button
             className={"btn " + (target === "cancelled" ? "danger" : "primary")}
             disabled={
               w.busy ||
@@ -628,7 +624,7 @@ export function StateDialog({
               : impact.data?.affected_items.length
                 ? "Cancel item and remove links"
                 : "Cancel item"}
-          </button>
+          </Button>
         </>
       }
     >
@@ -715,10 +711,10 @@ export function ResumeDialog({
       onClose={onClose}
       footer={
         <>
-          <button className="btn" onClick={onClose}>
+          <Button className="btn" onClick={onClose}>
             Not now
-          </button>
-          <button
+          </Button>
+          <Button
             className="btn primary"
             disabled={w.busy}
             onClick={() =>
@@ -740,7 +736,7 @@ export function ResumeDialog({
             }
           >
             Move to In progress
-          </button>
+          </Button>
         </>
       }
     >
@@ -783,10 +779,10 @@ export function CloseSprint({
       onClose={onClose}
       footer={
         <>
-          <button className="btn" onClick={onClose}>
+          <Button className="btn" onClick={onClose}>
             Keep sprint active
-          </button>
-          <button
+          </Button>
+          <Button
             className="btn primary"
             disabled={w.busy || !q.data || (needs && !dest)}
             onClick={() =>
@@ -809,7 +805,7 @@ export function CloseSprint({
             {needs
               ? `Move ${q.data?.unfinished.length} items and close`
               : "Close sprint"}
-          </button>
+          </Button>
         </>
       }
     >
@@ -843,19 +839,18 @@ export function CloseSprint({
                 </div>
               ))}
             </div>
-            <Field name="Move unfinished work to">
-              <select
-                value={destination}
-                onChange={(e) => setDestination(e.target.value)}
-              >
-                <option value="">Choose another sprint</option>
-                {q.data?.destinations.map((s) => (
-                  <option value={s.id} key={s.id}>
-                    {s.name}
-                  </option>
-                ))}
-              </select>
-            </Field>
+            <SelectField
+              title="Move unfinished work to"
+              value={destination}
+              onChange={setDestination}
+              options={[
+                { value: "", label: "Choose another sprint" },
+                ...(q.data?.destinations.map((s) => ({
+                  value: s.id,
+                  label: s.name,
+                })) ?? []),
+              ]}
+            />
             {!q.data?.destinations.length && (
               <p className="danger-text">
                 Create another sprint in Planning before closing.

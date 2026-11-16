@@ -1,5 +1,3 @@
-import type { SelectHTMLAttributes } from "react";
-
 const labels = { story: "Story", task: "Task", bug: "Bug" } as const;
 
 /** Type shapes remain distinct without color; visible text supplies their names. */
@@ -43,15 +41,6 @@ export function ItemType({ type }: { type: string }) {
     <span className="item-type-label">
       <TypeIcon type={type} />
       <span>{labels[type as keyof typeof labels]}</span>
-    </span>
-  );
-}
-
-export function TypeSelect(props: SelectHTMLAttributes<HTMLSelectElement>) {
-  return (
-    <span className="type-select">
-      <TypeIcon type={String(props.value ?? "")} />
-      <select {...props} />
     </span>
   );
 }

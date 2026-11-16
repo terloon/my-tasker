@@ -1,3 +1,5 @@
+import { Button } from "./controls";
+import SelectField from "./SelectField";
 import { ask } from "./ui";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
@@ -39,38 +41,38 @@ export function Users() {
         title="Users"
         description="Human and agent accounts. Project access is granted separately."
         actions={
-          <button className="btn primary" onClick={() => setCreate(true)}>
+          <Button className="btn primary" onClick={() => setCreate(true)}>
             + Create user
-          </button>
+          </Button>
         }
       />
       <div className="filters">
-        <select
-          className="btn"
-          aria-label="Account kind"
+        <SelectField
+          ariaLabel="Account kind"
           value={kind}
-          onChange={(e) => {
-            setKind(e.target.value);
+          onChange={(value) => {
+            setKind(value);
             setOffset(0);
           }}
-        >
-          <option value="">All types</option>
-          <option value="human">Human</option>
-          <option value="agent">Agent</option>
-        </select>
-        <select
-          className="btn"
-          aria-label="Account status"
+          options={[
+            { value: "", label: "All types" },
+            { value: "human", label: "Human" },
+            { value: "agent", label: "Agent" },
+          ]}
+        />
+        <SelectField
+          ariaLabel="Account status"
           value={status}
-          onChange={(e) => {
-            setStatus(e.target.value);
+          onChange={(value) => {
+            setStatus(value);
             setOffset(0);
           }}
-        >
-          <option value="">All statuses</option>
-          <option value="true">Enabled</option>
-          <option value="false">Disabled</option>
-        </select>
+          options={[
+            { value: "", label: "All statuses" },
+            { value: "true", label: "Enabled" },
+            { value: "false", label: "Disabled" },
+          ]}
+        />
       </div>
       {q.isPending ? (
         <Loading />
@@ -103,12 +105,12 @@ export function Users() {
                       {u.enabled ? "Enabled" : "Disabled"}
                     </td>
                     <td>
-                      <button
+                      <Button
                         className="btn small ghost"
                         onClick={() => setSelected(u)}
                       >
                         Details →
-                      </button>
+                      </Button>
                     </td>
                   </tr>
                 ))}
@@ -179,13 +181,20 @@ function UserEditor({
     <Modal
       title={initial ? "Edit user" : "Create user"}
       onClose={onClose}
-      dirty={!!name || !!username || !!password}
-      footer={
+      dirty={
+        name !== (initial?.display_name || "") ||
+        admin !== !!initial?.is_admin ||
+        kind !== (initial?.kind || "human") ||
+        !!username ||
+        !!password
+      }
+      dismissible={!w.busy}
+      footer={(requestClose) => (
         <>
-          <button className="btn" onClick={onClose}>
+          <Button className="btn" onClick={requestClose} disabled={w.busy}>
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
             className="btn primary"
             disabled={
               w.busy ||
@@ -202,25 +211,25 @@ function UserEditor({
                 : kind === "agent"
                   ? "Create agent"
                   : "Create human"}
-          </button>
+          </Button>
         </>
-      }
+      )}
     >
       <div className="stack">
         {!!w.error && <ErrorBox error={w.error} />}{" "}
         {!initial && (
-          <Field name="User type">
-            <select
-              value={kind}
-              onChange={(e) => {
-                setKind(e.target.value as "human" | "agent");
-                setAdmin(false);
-              }}
-            >
-              <option value="human">Human</option>
-              <option value="agent">Agent</option>
-            </select>
-          </Field>
+          <SelectField
+            title="User type"
+            value={kind}
+            onChange={(value) => {
+              setKind(value as "human" | "agent");
+              setAdmin(false);
+            }}
+            options={[
+              { value: "human", label: "Human" },
+              { value: "agent", label: "Agent" },
+            ]}
+          />
         )}
         <Field name={"Display name" + (kind === "agent" ? " (optional)" : "")}>
           <input
@@ -296,9 +305,9 @@ function UserDetail({
         subtitle={`${label(user.kind)} · ${user.is_admin ? "Administrator" : "User"}`}
         onClose={onClose}
         footer={
-          <button className="btn" onClick={onClose}>
+          <Button className="btn" onClick={onClose}>
             Close
-          </button>
+          </Button>
         }
       >
         <div className="stack">
@@ -315,11 +324,11 @@ function UserDetail({
           <p className={user.enabled ? "success-text" : "muted"}>
             {user.enabled ? "Enabled" : "Disabled"}
           </p>
-          <button className="btn" onClick={() => setEdit(true)}>
+          <Button className="btn" onClick={() => setEdit(true)}>
             Edit details
-          </button>
+          </Button>
           {user.kind === "agent" ? (
-            <button
+            <Button
               className="btn"
               onClick={async () => {
                 if (
@@ -338,13 +347,13 @@ function UserDetail({
               }}
             >
               Rotate agent password
-            </button>
+            </Button>
           ) : (
-            <button className="btn" onClick={() => setReset(true)}>
+            <Button className="btn" onClick={() => setReset(true)}>
               Reset password
-            </button>
+            </Button>
           )}
-          <button
+          <Button
             className={"btn " + (user.enabled ? "danger" : "")}
             onClick={async () => {
               if (
@@ -362,7 +371,7 @@ function UserDetail({
             }}
           >
             {user.enabled ? "Disable account" : "Enable account"}
-          </button>
+          </Button>
           <p className="small muted">
             The last enabled human administrator cannot be disabled or demoted.
           </p>
@@ -402,9 +411,9 @@ function Credentials({ user, onClose }: { user: User; onClose: () => void }) {
       subtitle={user.display_name}
       onClose={onClose}
       footer={
-        <button className="btn primary" onClick={onClose}>
+        <Button className="btn primary" onClick={onClose}>
           Done
-        </button>
+        </Button>
       }
     >
       <div className="stack">
@@ -415,12 +424,12 @@ function Credentials({ user, onClose }: { user: User; onClose: () => void }) {
         <Field name="Username">
           <input readOnly value={user.username} />
         </Field>
-        <button
+        <Button
           className="btn small"
           onClick={() => copy(user.username, "Username copied")}
         >
           Copy username
-        </button>
+        </Button>
         <Field name="UUID password">
           <textarea
             readOnly
@@ -428,12 +437,12 @@ function Credentials({ user, onClose }: { user: User; onClose: () => void }) {
             value={user.generated_password || ""}
           />
         </Field>
-        <button
+        <Button
           className="btn small"
           onClick={() => copy(user.generated_password || "", "Password copied")}
         >
           Copy UUID password
-        </button>
+        </Button>
         <p className="small" role="status">
           {copied}
         </p>
@@ -546,7 +555,7 @@ export function Permissions() {
         <div className="permission-layout">
           <aside className="panel">
             {q.data?.users.map((r) => (
-              <button
+              <Button
                 className={
                   "user-choice " + (selected === r.user.id ? "selected" : "")
                 }
@@ -564,7 +573,7 @@ export function Permissions() {
                   {label(r.user.kind)}
                   {r.user.is_admin ? " · Administrator" : ""}
                 </div>
-              </button>
+              </Button>
             ))}
           </aside>
           <section className="panel stack">
@@ -628,7 +637,7 @@ export function Permissions() {
               </p>
             )}
             <div className="between">
-              <button
+              <Button
                 className="btn ghost danger-text"
                 disabled={!selected || !!row?.user.is_admin || w.busy}
                 onClick={async () => {
@@ -651,16 +660,16 @@ export function Permissions() {
                 }}
               >
                 Revoke access
-              </button>
+              </Button>
               <div className="row">
-                <button
+                <Button
                   className="btn"
                   disabled={!dirty}
                   onClick={() => load(selected)}
                 >
                   Discard changes
-                </button>
-                <button
+                </Button>
+                <Button
                   className="btn primary"
                   disabled={!dirty || w.busy || !!row?.user.is_admin}
                   onClick={() =>
@@ -679,7 +688,7 @@ export function Permissions() {
                   }
                 >
                   Save permissions
-                </button>
+                </Button>
               </div>
             </div>
           </section>
@@ -708,13 +717,14 @@ export function PasswordDialog({
       title={adminReset ? "Reset human password" : "Change password"}
       subtitle={user.username}
       onClose={onClose}
-      dirty={!!password}
-      footer={
+      dirty={!!(current || password || confirmPassword)}
+      dismissible={!w.busy}
+      footer={(requestClose) => (
         <>
-          <button className="btn" onClick={onClose}>
+          <Button className="btn" onClick={requestClose} disabled={w.busy}>
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
             className="btn primary"
             disabled={
               w.busy ||
@@ -746,9 +756,9 @@ export function PasswordDialog({
             }
           >
             {adminReset ? "Reset password" : "Change password"}
-          </button>
+          </Button>
         </>
-      }
+      )}
     >
       <div className="stack">
         {!!w.error && <ErrorBox error={w.error} />}{" "}

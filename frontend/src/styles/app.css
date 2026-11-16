@@ -21,10 +21,6 @@
 .person > span:not(.avatar) {
   overflow-wrap: anywhere;
 }
-.project-switch {
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
 .brand {
   white-space: nowrap;
 }
@@ -119,22 +115,6 @@
 .markdown th {
   background: var(--bg);
 }
-.modal {
-  padding: 0;
-  color: var(--text);
-  margin: auto;
-  inset: 0;
-  max-height: calc(100dvh - 40px);
-}
-.modal::backdrop {
-  background: #09132280;
-}
-.modal .modal-footer {
-  flex-wrap: wrap;
-}
-.modal .modal-content {
-  overflow-wrap: anywhere;
-}
 .modal .field input,
 .modal .field textarea {
   max-width: 100%;
@@ -157,12 +137,6 @@
 .card-state {
   width: 100%;
   margin-top: 12px;
-  padding: 5px;
-  border: 1px solid var(--strong-line);
-  border-radius: 5px;
-  color: var(--text);
-  background: var(--surface);
-  font-size: 12px;
 }
 .file-open {
   display: grid;
@@ -182,36 +156,86 @@
   object-fit: contain;
   margin: auto;
 }
-.overflow-menu {
-  position: relative;
-}
-.overflow-menu summary {
-  list-style: none;
-  cursor: pointer;
-}
-.overflow-menu summary::-webkit-details-marker {
-  display: none;
-}
-.menu-popover {
-  position: absolute;
-  right: 0;
-  top: 100%;
-  z-index: 15;
+.action-menu-paper {
   min-width: 180px;
-  padding: 6px;
+  margin-top: 4px;
   background: var(--raised);
+  color: var(--text);
   border: 1px solid var(--strong-line);
   border-radius: 7px;
   box-shadow: var(--shadow);
 }
-.menu-popover .btn {
-  justify-content: flex-start;
+.action-menu-paper .MuiMenu-list {
+  padding: 5px;
+}
+.action-menu-paper .MuiMenuItem-root {
+  min-height: 34px;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font: inherit;
+}
+.action-menu-paper .MuiMenuItem-root:hover,
+.action-menu-paper .MuiMenuItem-root.Mui-focusVisible {
+  background: var(--accent-soft);
+}
+.planner-select.MuiOutlinedInput-root {
+  min-width: 0;
+  max-width: 100%;
+  min-height: 38px;
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+}
+.planner-select .MuiSelect-select {
+  padding: 8px 32px 8px 10px;
+  line-height: 20px;
+}
+.planner-select .MuiSelect-icon {
+  color: var(--muted);
+}
+.planner-select .MuiOutlinedInput-notchedOutline,
+.planner-select:hover .MuiOutlinedInput-notchedOutline {
+  border-color: var(--strong-line);
+}
+.planner-select.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: var(--accent);
+}
+.planner-select-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 100%;
+}
+.planner-select .planner-select-option > span:last-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.planner-select-menu .MuiMenuItem-root {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.planner-select-menu .MuiMenuItem-root.Mui-selected,
+.planner-select-menu .MuiMenuItem-root.Mui-selected:hover {
+  background: var(--accent-soft);
+}
+.planner-select-check {
+  display: grid;
+  place-items: center;
+  flex: 0 0 16px;
+  height: 16px;
+  border: 1px solid var(--strong-line);
+  border-radius: 3px;
+  font-size: 12px;
+  line-height: 1;
+}
+.planner-select-check[data-checked="true"] {
+  background: var(--accent);
+  color: var(--on-accent);
+  border-color: var(--accent);
 }
 .wrap {
   overflow-wrap: anywhere;
-}
-.field select[multiple] {
-  min-height: 80px;
 }
 .work-card a.item-title {
   color: var(--text);
@@ -244,10 +268,6 @@
   .header {
     z-index: 10;
   }
-  .modal {
-    max-width: calc(100vw - 24px);
-    max-height: calc(100dvh - 24px);
-  }
   .detail-side {
     grid-template-columns: 1fr 1fr;
   }
@@ -277,15 +297,6 @@
   .mini-window {
     height: 50px;
   }
-}
-
-dialog.drawer {
-  margin: 0 0 0 auto;
-  height: 100dvh;
-  max-height: 100dvh;
-  max-width: 100vw;
-  width: min(460px, 100vw);
-  border-radius: 0;
 }
 
 [hidden] {
@@ -760,17 +771,6 @@ h1[tabindex="-1"]:focus {
 .item-type-cell {
   min-width: 95px;
   white-space: nowrap;
-}
-.type-select {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  width: 100%;
-}
-.type-select select {
-  min-width: 0;
-  flex: 1;
-  width: 100%;
 }
 .type-filter-selection {
   margin-top: 7px;

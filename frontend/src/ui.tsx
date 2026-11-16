@@ -1,15 +1,23 @@
 import { ItemType } from "./ItemType";
+import { Button } from "./controls";
 import { visibleHierarchyItems } from "./item-hierarchy";
 import {
   createContext,
   useContext,
   useEffect,
+  lazy,
+  Suspense,
   useRef,
   useState,
+  type ComponentProps,
   type ReactNode,
 } from "react";
 import { Link } from "react-router-dom";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  useQuery,
+  useQueryClient,
+  type QueryClient,
+} from "@tanstack/react-query";
 import {
   allPages,
   api,
@@ -79,10 +87,10 @@ export function ConfirmHost() {
       onClose={() => finish(false)}
       footer={
         <>
-          <button className="btn" onClick={() => finish(false)}>
+          <Button className="btn" onClick={() => finish(false)}>
             Keep unchanged
-          </button>
-          <button
+          </Button>
+          <Button
             className={
               "btn " +
               ([
@@ -98,7 +106,7 @@ export function ConfirmHost() {
             onClick={() => finish(true)}
           >
             {verb}
-          </button>
+          </Button>
         </>
       }
     >
@@ -106,15 +114,32 @@ export function ConfirmHost() {
     </Modal>
   );
 }
+async function readWithSessionRecovery<T>(
+  client: QueryClient,
+  key: unknown[],
+  read: () => Promise<T>,
+) {
+  try {
+    return await read();
+  } catch (error) {
+    // The sign-in dialog covers the workspace until these queries can refresh.
+    if (error instanceof ApiError && error.status === 401) {
+      const previous = client.getQueryData<T>(key);
+      if (previous !== undefined) return previous;
+    }
+    throw error;
+  }
+}
 export function useData<T>(
   key: unknown[],
   path: string,
   enabled = true,
   poll = true,
 ) {
+  const client = useQueryClient();
   return useQuery<T>({
     queryKey: key,
-    queryFn: () => api<T>(path),
+    queryFn: () => readWithSessionRecovery(client, key, () => api<T>(path)),
     enabled,
     refetchInterval: poll ? 10000 : false,
     refetchOnWindowFocus: poll,
@@ -132,9 +157,11 @@ export function useItem(itemId?: string, { observeOnly = false } = {}) {
   );
 }
 export function useCollection<T>(key: unknown[], path: string, enabled = true) {
+  const client = useQueryClient();
   return useQuery<Page<T>>({
     queryKey: key,
-    queryFn: () => allPages<T>(path),
+    queryFn: () =>
+      readWithSessionRecovery(client, key, () => allPages<T>(path)),
     enabled,
     refetchInterval: 10000,
     refetchIntervalInBackground: false,
@@ -158,9 +185,9 @@ export function ErrorBox({
         </p>
       )}
       {retry && (
-        <button className="btn small" onClick={retry}>
+        <Button className="btn small" onClick={retry}>
           Retry
-        </button>
+        </Button>
       )}
     </div>
   );
@@ -366,7 +393,7 @@ export function ItemTable(props: ItemTableProps) {
                       }}
                     >
                       {branch.has_children ? (
-                        <button
+                        <Button
                           className="hierarchy-toggle"
                           type="button"
                           aria-label={`${expanded ? "Collapse" : "Expand"} ${i.key}`}
@@ -374,7 +401,7 @@ export function ItemTable(props: ItemTableProps) {
                           onClick={() => tree?.onToggle(i.id)}
                         >
                           <span aria-hidden="true">{expanded ? "▾" : "▸"}</span>
-                        </button>
+                        </Button>
                       ) : (
                         <span className="hierarchy-toggle-space" />
                       )}
@@ -446,107 +473,31 @@ export function Pagination({
         {Math.min(data.offset + data.limit, data.total)}
       </span>
       <div className="row">
-        <button
+        <Button
           className="btn small"
           disabled={data.offset === 0}
           onClick={() => onChange(Math.max(0, data.offset - data.limit))}
         >
           Previous
-        </button>
-        <button
+        </Button>
+        <Button
           className="btn small"
           disabled={data.offset + data.limit >= data.total}
           onClick={() => onChange(data.offset + data.limit)}
         >
           Next
-        </button>
+        </Button>
       </div>
     </div>
   );
 }
-export function Modal({
-  title,
-  subtitle,
-  children,
-  footer,
-  onClose,
-  wide = false,
-  dirty = false,
-  drawer = false,
-  dismissible = true,
-}: {
-  title: string;
-  subtitle?: string;
-  children: ReactNode;
-  footer?: ReactNode;
-  onClose: () => void;
-  wide?: boolean;
-  dirty?: boolean;
-  drawer?: boolean;
-  dismissible?: boolean;
-}) {
-  const ref = useRef<HTMLDialogElement>(null);
-  const [guard, setGuard] = useState(false);
-  const close = () => (dirty ? setGuard(true) : onClose());
-  useEffect(() => {
-    const previous = document.activeElement as HTMLElement | null;
-    ref.current?.showModal();
-    return () => {
-      ref.current?.close();
-      previous?.focus();
-    };
-  }, []);
+const MaterialModal = lazy(() => import("./overlays"));
+
+export function Modal(props: ComponentProps<typeof MaterialModal>) {
   return (
-    <>
-      <dialog
-        ref={ref}
-        className={"modal " + (wide ? "wide" : "") + (drawer ? " drawer" : "")}
-        aria-label={title}
-        onCancel={(e) => {
-          e.preventDefault();
-          if (dismissible) close();
-        }}
-      >
-        <div className="modal-head">
-          <div>
-            <h1>{title}</h1>
-            {subtitle && <p className="modal-subtitle">{subtitle}</p>}
-          </div>
-          {dismissible && (
-            <button
-              className="btn ghost icon-btn"
-              aria-label="Close dialog"
-              onClick={close}
-            >
-              ×
-            </button>
-          )}
-        </div>
-        <div className="modal-content">{children}</div>
-        {footer && <div className="modal-footer">{footer}</div>}
-      </dialog>
-      {guard && (
-        <Modal
-          title="Leave without saving?"
-          onClose={() => setGuard(false)}
-          footer={
-            <>
-              <button className="btn" onClick={onClose}>
-                Discard changes
-              </button>
-              <button className="btn primary" onClick={() => setGuard(false)}>
-                Keep editing
-              </button>
-            </>
-          }
-        >
-          <p>
-            Your changes have not been saved. The saved record will remain
-            unchanged.
-          </p>
-        </Modal>
-      )}
-    </>
+    <Suspense fallback={null}>
+      <MaterialModal {...props} />
+    </Suspense>
   );
 }
 export function Field({
@@ -650,20 +601,20 @@ export function Activity({
           <div className="footer-row">
             <span>{cursor ? "Reading older history" : "Latest activity"}</span>
             <div className="row">
-              <button
+              <Button
                 className="btn small"
                 disabled={cursors.length === 1}
                 onClick={() => setCursors((c) => c.slice(0, -1))}
               >
                 Newer
-              </button>
-              <button
+              </Button>
+              <Button
                 className="btn small"
                 disabled={!q.data.next_cursor}
                 onClick={() => setCursors((c) => [...c, q.data!.next_cursor])}
               >
                 Load older
-              </button>
+              </Button>
             </div>
           </div>
         </>

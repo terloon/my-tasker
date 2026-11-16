@@ -1,3 +1,5 @@
+import SelectField from "./SelectField";
+import { ActionMenu, Button } from "./controls";
 import { useEffect, useState } from "react";
 import {
   Link,
@@ -193,9 +195,9 @@ export default function App() {
             title="Your session has expired"
             onClose={() => setExpired(false)}
             footer={
-              <button className="btn primary" onClick={() => setExpired(false)}>
+              <Button className="btn primary" onClick={() => setExpired(false)}>
                 Sign in
-              </button>
+              </Button>
             }
           >
             <p>
@@ -258,26 +260,20 @@ export default function App() {
             </span>
             Local Planner
           </Link>
-          <div>
-            <div className="nav-label">Workspace</div>
-            <select
-              className="btn project-switch"
-              aria-label="Selected project"
-              value={pid || ""}
-              onChange={(e) => {
-                setSelection(e.target.value);
-                nav("/projects/" + e.target.value);
-                setMenu(false);
-              }}
-            >
-              {!all.length && <option value="">No projects</option>}
-              {all.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.name}
-                </option>
-              ))}
-            </select>
-          </div>
+          <SelectField
+            title="Workspace"
+            value={pid || ""}
+            options={
+              all.length
+                ? all.map((p) => ({ value: p.id, label: p.name }))
+                : [{ value: "", label: "No projects" }]
+            }
+            onChange={(next) => {
+              setSelection(next);
+              nav("/projects/" + next);
+              setMenu(false);
+            }}
+          />
           <nav className="nav-group" aria-label="Main navigation">
             {links.map(([name, to, glyph]) => (
               <Link
@@ -337,13 +333,13 @@ export default function App() {
         <div className="app-main">
           <header className="header">
             <div className="row header-context">
-              <button
+              <Button
                 className="btn ghost mobile-menu"
                 aria-label="Toggle navigation"
                 onClick={() => setMenu(!menu)}
               >
                 ☰
-              </button>
+              </Button>
               <div className="breadcrumb">
                 {breadcrumbProject && (
                   <>
@@ -369,19 +365,15 @@ export default function App() {
               >
                 ◐
               </Link>
-              <details className="overflow-menu">
-                <summary className="avatar" aria-label="Account menu">
-                  {user.display_name.slice(0, 2).toUpperCase()}
-                </summary>
-                <div className="menu-popover">
-                  <Link to="/settings/account" className="btn ghost full">
-                    Account
-                  </Link>
-                  <button className="btn ghost full" onClick={logout}>
-                    Sign out
-                  </button>
-                </div>
-              </details>
+              <ActionMenu
+                label="Account menu"
+                className="avatar"
+                trigger={user.display_name.slice(0, 2).toUpperCase()}
+                actions={[
+                  { label: "Account", to: "/settings/account" },
+                  { label: "Sign out", onSelect: logout },
+                ]}
+              />
             </div>
           </header>
           <main className="page" key={user.id}>
@@ -535,9 +527,9 @@ function Auth({
             />
             Show password
           </label>
-          <button className="btn primary full" disabled={busy}>
+          <Button type="submit" className="btn primary full" disabled={busy}>
             {busy ? "Please wait…" : setup ? "Create administrator" : "Sign in"}
-          </button>
+          </Button>
         </form>
         <p className="auth-footer">
           {setup
@@ -548,7 +540,7 @@ function Auth({
           className="row"
           style={{ justifyContent: "center", marginTop: 16 }}
         >
-          <button
+          <Button
             className="btn ghost small"
             onClick={() =>
               theme({
@@ -561,7 +553,7 @@ function Auth({
             }
           >
             ◐ Toggle appearance
-          </button>
+          </Button>
         </div>
       </div>
     </main>
@@ -621,7 +613,7 @@ function Appearance() {
         </div>
         <div className="mode-grid">
           {(["light", "dark", "system"] as const).map((mode) => (
-            <button
+            <Button
               key={mode}
               disabled={w.busy}
               className={
@@ -634,7 +626,7 @@ function Appearance() {
                 <span />
               </div>
               {label(mode)}
-            </button>
+            </Button>
           ))}
         </div>
         <p className="small muted">System follows your device's appearance.</p>
@@ -643,7 +635,7 @@ function Appearance() {
         <h2>Accent color</h2>
         <div className="swatches section">
           {Object.entries(accentColors).map(([name, colors]) => (
-            <button
+            <Button
               key={name}
               className="swatch"
               aria-pressed={p.accent === name}
@@ -665,7 +657,7 @@ function Appearance() {
                 aria-hidden
               />
               {name}
-            </button>
+            </Button>
           ))}
         </div>
       </section>
@@ -678,8 +670,8 @@ function Appearance() {
             </span>
           ))}
         </div>
-        <button className="btn primary">Primary action</button>{" "}
-        <button className="btn">Secondary action</button>
+        <Button className="btn primary">Primary action</Button>{" "}
+        <Button className="btn">Secondary action</Button>
       </div>
     </>
   );
@@ -710,15 +702,15 @@ function Account() {
               Changing your password signs out existing sessions.
             </p>
           </div>
-          <button className="btn" onClick={() => setPassword(true)}>
+          <Button className="btn" onClick={() => setPassword(true)}>
             Change password
-          </button>
+          </Button>
         </section>
         <section className="panel between">
           <h2>Sign out</h2>
-          <button className="btn" onClick={logout}>
+          <Button className="btn" onClick={logout}>
             Sign out
-          </button>
+          </Button>
         </section>
       </div>
       {password && (

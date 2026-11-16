@@ -1,4 +1,6 @@
-import { ItemType, TypeSelect } from "./ItemType";
+import { ActionMenu, Button } from "./controls";
+import { ItemType, TypeIcon } from "./ItemType";
+import SelectField from "./SelectField";
 import { ask } from "./ui";
 import { useEffect, useRef, useState } from "react";
 import { Link, useBlocker, useLocation, useParams } from "react-router-dom";
@@ -162,46 +164,45 @@ function Detail({ itemId }: { itemId: string }) {
           </div>
         </div>
         {can(i, "item", "update") && (
-          <button className="btn small ghost" onClick={() => setUnlink(edge)}>
+          <Button className="btn small ghost" onClick={() => setUnlink(edge)}>
             Remove
-          </button>
+          </Button>
         )}
       </div>
     );
   }
   return (
     <>
-      <div className="eyebrow">
+      <div className="eyebrow row">
         {typeof planningSearch === "string" ? (
           <Link to={`/projects/${i.project_id}/planning?${planningSearch}`}>
             Back to sprint planning
           </Link>
         ) : (
           <Link to={"/items?project_id=" + i.project_id}>Items</Link>
-        )}{" "}
-        / {i.key} <ItemType type={i.type} />
+        )}
+        <span>/ {i.key}</span>
+        <ItemType type={i.type} />
       </div>
       <Heading
         title={i.title}
         actions={
           can(i, "item", "delete") && (
-            <details className="overflow-menu">
-              <summary className="btn ghost" aria-label="Item actions">
-                •••
-              </summary>
-              <div className="menu-popover">
-                <button
-                  className="btn ghost full danger-text"
-                  onClick={() =>
+            <ActionMenu
+              label="Item actions"
+              className="btn ghost"
+              trigger="•••"
+              actions={[
+                {
+                  label: "Delete item",
+                  danger: true,
+                  onSelect: () =>
                     api<Impact>(`/items/${i.id}/deletion-preview`)
                       .then(setDeleting)
-                      .catch(w.setError)
-                  }
-                >
-                  Delete item
-                </button>
-              </div>
-            </details>
+                      .catch(w.setError),
+                },
+              ]}
+            />
           )
         }
       />
@@ -222,12 +223,12 @@ function Detail({ itemId }: { itemId: string }) {
             </p>
           </div>
           {can(i, "item", "update") && (
-            <button
+            <Button
               className="btn primary small"
               onClick={() => setResume(true)}
             >
               Move to In progress
-            </button>
+            </Button>
           )}
         </div>
       )}
@@ -243,7 +244,7 @@ function Detail({ itemId }: { itemId: string }) {
             <div className="section-head">
               <h2>Description</h2>
               {can(i, "item", "update") && (
-                <button
+                <Button
                   className="btn ghost small"
                   onClick={async () => {
                     if (
@@ -260,7 +261,7 @@ function Detail({ itemId }: { itemId: string }) {
                 >
                   {" "}
                   {editing ? "Cancel" : "Edit"}
-                </button>
+                </Button>
               )}
             </div>
             {editing ? (
@@ -293,7 +294,7 @@ function Detail({ itemId }: { itemId: string }) {
                       </div>
                     </div>
                     <div className="row">
-                      <button
+                      <Button
                         className="btn small"
                         onClick={() => {
                           setDescription(i.description);
@@ -302,18 +303,18 @@ function Detail({ itemId }: { itemId: string }) {
                         }}
                       >
                         Load latest
-                      </button>
-                      <button
+                      </Button>
+                      <Button
                         className="btn small"
                         onClick={() => setDraftVersion(i.version)}
                       >
                         Keep draft against this version
-                      </button>
+                      </Button>
                     </div>
                   </div>
                 )}
                 <div className="row">
-                  <button
+                  <Button
                     className="btn primary"
                     disabled={
                       w.busy || !title.trim() || draftVersion !== i.version
@@ -332,8 +333,8 @@ function Detail({ itemId }: { itemId: string }) {
                     }
                   >
                     Save description
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     className="btn ghost"
                     onClick={async () => {
                       if (
@@ -344,7 +345,7 @@ function Detail({ itemId }: { itemId: string }) {
                     }}
                   >
                     Cancel
-                  </button>
+                  </Button>
                 </div>
               </div>
             ) : (
@@ -355,12 +356,12 @@ function Detail({ itemId }: { itemId: string }) {
             <div className="section-head">
               <h2>Dependencies</h2>
               {can(i, "item", "update") && (
-                <button
+                <Button
                   className="btn ghost small"
                   onClick={() => setAddLink(true)}
                 >
                   + Add link
-                </button>
+                </Button>
               )}
             </div>
             <div className="panel">
@@ -398,19 +399,19 @@ function Detail({ itemId }: { itemId: string }) {
           <section className="section">
             <div className="tabs">
               {can(i, "comment") && (
-                <button
+                <Button
                   className={"tab " + (tab === "comments" ? "active" : "")}
                   onClick={() => setTab("comments")}
                 >
                   Comments
-                </button>
+                </Button>
               )}
-              <button
+              <Button
                 className={"tab " + (tab === "activity" ? "active" : "")}
                 onClick={() => setTab("activity")}
               >
                 Activity
-              </button>
+              </Button>
             </div>
             {tab === "activity" || !can(i, "comment") ? (
               <Activity projectId={i.project_id} itemId={i.id} />
@@ -420,116 +421,92 @@ function Detail({ itemId }: { itemId: string }) {
           </section>
         </div>
         <aside className="detail-side">
-          <Field name="State">
-            <select
-              disabled={!can(i, "item", "update")}
-              value={i.state}
-              onChange={(e) => changeState(e.target.value).catch(() => {})}
-            >
-              {itemStateOptions(i.state).map((s) => (
-                <option key={s} value={s}>
-                  {label(s)}
-                </option>
-              ))}
-            </select>
-          </Field>
-          <Field name="Type">
-            <TypeSelect
-              disabled={!can(i, "item", "update")}
-              value={i.type}
-              onChange={(e) => update({ type: e.target.value }).catch(() => {})}
-            >
-              {types.map((s) => (
-                <option key={s} value={s}>
-                  {label(s)}
-                </option>
-              ))}
-            </TypeSelect>
-          </Field>
-          <Field name="Sprint">
-            <select
-              disabled={!can(i, "item", "update") || !can(i, "sprint")}
-              value={i.sprint_id || ""}
-              onChange={(e) =>
-                update({ sprint_id: e.target.value || null }).catch(() => {})
-              }
-            >
-              <option value="">Backlog</option>
-              {sp.data?.items
+          <SelectField
+            title="State"
+            disabled={!can(i, "item", "update")}
+            value={i.state}
+            onChange={(value) => changeState(value).catch(() => {})}
+            options={itemStateOptions(i.state).map((s) => ({
+              value: s,
+              label: label(s),
+            }))}
+          />
+          <SelectField
+            title="Type"
+            disabled={!can(i, "item", "update")}
+            value={i.type}
+            onChange={(value) => update({ type: value }).catch(() => {})}
+            options={types.map((t) => ({
+              value: t,
+              label: label(t),
+              icon: <TypeIcon type={t} />,
+            }))}
+          />
+          <SelectField
+            title="Sprint"
+            disabled={!can(i, "item", "update") || !can(i, "sprint")}
+            value={i.sprint_id || ""}
+            unavailableLabel={i.sprint_name}
+            onChange={(value) =>
+              update({ sprint_id: value || null }).catch(() => {})
+            }
+            options={[
+              { value: "", label: "Backlog" },
+              ...(sp.data?.items
                 .filter((s) => s.state !== "closed" || s.id === i.sprint_id)
-                .map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.name}
-                    {s.state === "closed" ? " · Closed" : ""}
-                  </option>
-                ))}
-            </select>
-          </Field>
-          <Field name="Assignee">
-            <select
-              disabled={!can(i, "item", "update")}
-              value={i.assignee_id || ""}
-              onChange={(e) =>
-                update({ assignee_id: e.target.value || null }).catch(() => {})
-              }
-            >
-              <option value="">Unassigned</option>
-              {i.assignee &&
-                !users.data?.some((u) => u.id === i.assignee_id) && (
-                  <option value={i.assignee.id}>
-                    {i.assignee.display_name} · Inactive
-                  </option>
-                )}
-              {users.data?.map((u) => (
-                <option value={u.id} key={u.id}>
-                  {u.display_name}
-                  {u.kind === "agent" ? " · Agent" : ""}
-                </option>
-              ))}
-            </select>
-          </Field>
-          <Field name="Priority">
-            <select
-              disabled={!can(i, "item", "update")}
-              value={i.priority}
-              onChange={(e) =>
-                update({ priority: e.target.value }).catch(() => {})
-              }
-            >
-              {priorities.map((s) => (
-                <option value={s} key={s}>
-                  {label(s)}
-                </option>
-              ))}
-            </select>
-          </Field>
-          <Field name="Labels">
-            <select
-              multiple
-              disabled={!can(i, "item", "update")}
-              value={i.label_ids}
-              onChange={(e) =>
-                update({
-                  label_ids: [...e.target.selectedOptions].map((o) => o.value),
-                }).catch(() => {})
-              }
-            >
-              {labels.data?.map((l) => (
-                <option value={l.id} key={l.id}>
-                  {l.name}
-                </option>
-              ))}
-            </select>
-          </Field>
+                .map((s) => ({
+                  value: s.id,
+                  label: s.name + (s.state === "closed" ? " · Closed" : ""),
+                })) ?? []),
+            ]}
+          />
+          <SelectField
+            title="Assignee"
+            disabled={!can(i, "item", "update")}
+            value={i.assignee_id || ""}
+            unavailableLabel={
+              i.assignee ? i.assignee.display_name + " · Inactive" : undefined
+            }
+            onChange={(value) =>
+              update({ assignee_id: value || null }).catch(() => {})
+            }
+            options={[
+              { value: "", label: "Unassigned" },
+              ...(users.data?.map((u) => ({
+                value: u.id,
+                label: u.display_name + (u.kind === "agent" ? " · Agent" : ""),
+              })) ?? []),
+            ]}
+          />
+          <SelectField
+            title="Priority"
+            disabled={!can(i, "item", "update")}
+            value={i.priority}
+            onChange={(value) => update({ priority: value }).catch(() => {})}
+            options={priorities.map((p) => ({ value: p, label: label(p) }))}
+          />
+          <SelectField
+            title="Labels"
+            multiple
+            emptyLabel="No labels selected"
+            unavailableLabel="Unavailable label"
+            disabled={!can(i, "item", "update")}
+            optionsDisabled={w.busy}
+            value={i.label_ids}
+            onChange={(values) => update({ label_ids: values }).catch(() => {})}
+            options={
+              labels.data?.map((l) => ({ value: l.id, label: l.name })) ?? []
+            }
+          />
           {(can(i, "item", "create") ||
             can(i, "item", "update") ||
             can(i, "item", "delete")) && (
-            <button
+            <Button
               className="btn ghost small"
               onClick={() => setLabelManager(true)}
             >
               Manage labels
-            </button>
+            </Button>
           )}
           <div className="small muted">
             Created {when(i.created_at)}
@@ -544,15 +521,15 @@ function Detail({ itemId }: { itemId: string }) {
           onClose={() => navigation.reset()}
           footer={
             <>
-              <button className="btn" onClick={() => navigation.proceed()}>
+              <Button className="btn" onClick={() => navigation.proceed()}>
                 Discard changes
-              </button>
-              <button
+              </Button>
+              <Button
                 className="btn primary"
                 onClick={() => navigation.reset()}
               >
                 Keep editing
-              </button>
+              </Button>
             </>
           }
         >
@@ -587,10 +564,10 @@ function Detail({ itemId }: { itemId: string }) {
           onClose={() => setUnlink(null)}
           footer={
             <>
-              <button className="btn" onClick={() => setUnlink(null)}>
+              <Button className="btn" onClick={() => setUnlink(null)}>
                 Keep link
-              </button>
-              <button
+              </Button>
+              <Button
                 className="btn danger"
                 disabled={w.busy}
                 onClick={() =>
@@ -617,7 +594,7 @@ function Detail({ itemId }: { itemId: string }) {
                 i.blocker_summary.total === 1
                   ? "Remove blocker and move to Open"
                   : "Remove link"}
-              </button>
+              </Button>
             </>
           }
         >
@@ -643,10 +620,10 @@ function Detail({ itemId }: { itemId: string }) {
           wide
           footer={
             <>
-              <button className="btn" onClick={() => setDeleting(null)}>
+              <Button className="btn" onClick={() => setDeleting(null)}>
                 Keep item
-              </button>
-              <button
+              </Button>
+              <Button
                 className="btn danger"
                 disabled={w.busy}
                 onClick={() =>
@@ -662,7 +639,7 @@ function Detail({ itemId }: { itemId: string }) {
                 }
               >
                 Delete item and its files/comments
-              </button>
+              </Button>
             </>
           }
         >
@@ -728,42 +705,36 @@ function LinkDialog({ item, onClose }: { item: Item; onClose: () => void }) {
       onClose={onClose}
       footer={
         <>
-          <button className="btn" onClick={onClose}>
+          <Button className="btn" onClick={onClose}>
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
             className="btn primary"
             disabled={!selected.length || w.busy}
             onClick={() => save().catch(() => {})}
           >
             Add links
-          </button>
+          </Button>
         </>
       }
     >
       <div className="stack">
         {!!w.error && <ErrorBox error={w.error} />}
-        <Field name="This item is…">
-          <select
-            value={relationship}
-            onChange={(e) => {
-              setRelationship(e.target.value);
-              setSelected([]);
-            }}
-          >
-            {[
-              ["related", "Related to"],
-              ["parent", "Child of"],
-              ["child", "Parent of"],
-              ["blocked_by", "Blocked by"],
-              ["blocks", "Blocks"],
-            ].map(([v, t]) => (
-              <option value={v} key={v}>
-                {t}
-              </option>
-            ))}
-          </select>
-        </Field>
+        <SelectField
+          title="This item is…"
+          value={relationship}
+          onChange={(value) => {
+            setRelationship(value);
+            setSelected([]);
+          }}
+          options={[
+            { value: "related", label: "Related to" },
+            { value: "parent", label: "Child of" },
+            { value: "child", label: "Parent of" },
+            { value: "blocked_by", label: "Blocked by" },
+            { value: "blocks", label: "Blocks" },
+          ]}
+        />
         <CandidatePicker
           items={candidates}
           selected={selected}
@@ -793,9 +764,9 @@ function LabelManager({ item, onClose }: { item: Item; onClose: () => void }) {
       title="Project labels"
       onClose={onClose}
       footer={
-        <button className="btn primary" onClick={onClose}>
+        <Button className="btn primary" onClick={onClose}>
           Done
-        </button>
+        </Button>
       }
     >
       <div className="stack">
@@ -805,7 +776,7 @@ function LabelManager({ item, onClose }: { item: Item; onClose: () => void }) {
             <span className="label">{l.name}</span>
             <div className="row">
               {can(item, "item", "update") && (
-                <button
+                <Button
                   className="btn small ghost"
                   onClick={() => {
                     setEditing(l);
@@ -813,10 +784,10 @@ function LabelManager({ item, onClose }: { item: Item; onClose: () => void }) {
                   }}
                 >
                   Rename
-                </button>
+                </Button>
               )}
               {can(item, "item", "delete") && (
-                <button
+                <Button
                   className="btn small ghost danger-text"
                   onClick={async () => {
                     if (
@@ -833,7 +804,7 @@ function LabelManager({ item, onClose }: { item: Item; onClose: () => void }) {
                   }}
                 >
                   Delete
-                </button>
+                </Button>
               )}
             </div>
           </div>
@@ -848,7 +819,7 @@ function LabelManager({ item, onClose }: { item: Item; onClose: () => void }) {
               />
             </Field>
             <div className="row">
-              <button
+              <Button
                 className="btn"
                 disabled={!name.trim() || w.busy}
                 onClick={() =>
@@ -873,9 +844,9 @@ function LabelManager({ item, onClose }: { item: Item; onClose: () => void }) {
                 }
               >
                 {editing ? "Save name" : "Add label"}
-              </button>
+              </Button>
               {editing && (
-                <button
+                <Button
                   className="btn ghost"
                   onClick={() => {
                     setName("");
@@ -883,7 +854,7 @@ function LabelManager({ item, onClose }: { item: Item; onClose: () => void }) {
                   }}
                 >
                   Cancel rename
-                </button>
+                </Button>
               )}
             </div>
           </>
@@ -943,7 +914,7 @@ function Comments({ item }: { item: Item }) {
                 )}
                 <div className="row">
                   {can(item, "comment", "update") && (
-                    <button
+                    <Button
                       className="btn ghost small"
                       onClick={() => {
                         if (editing?.id === c.id) {
@@ -956,10 +927,10 @@ function Comments({ item }: { item: Item }) {
                       }}
                     >
                       {editing?.id === c.id ? "Cancel edit" : "Edit"}
-                    </button>
+                    </Button>
                   )}
                   {can(item, "comment", "delete") && (
-                    <button
+                    <Button
                       className="btn ghost small danger-text"
                       onClick={async () => {
                         if (await ask("Permanently remove this comment?"))
@@ -972,7 +943,7 @@ function Comments({ item }: { item: Item }) {
                       }}
                     >
                       Delete
-                    </button>
+                    </Button>
                   )}
                 </div>
               </div>
@@ -996,7 +967,7 @@ function Comments({ item }: { item: Item }) {
             />
           </Field>
           <div>
-            <button
+            <Button
               className="btn primary"
               disabled={!body.trim() || w.busy}
               onClick={() =>
@@ -1022,7 +993,7 @@ function Comments({ item }: { item: Item }) {
               }
             >
               {editing ? "Save comment" : "Add comment"}
-            </button>
+            </Button>
           </div>
         </div>
       )}
@@ -1093,25 +1064,25 @@ function Files({ item }: { item: Item }) {
             Uploading {pendingFile?.file.name} · {progress}%
           </p>
           <progress max={100} value={progress} />
-          <button className="btn small" onClick={() => abort.current?.abort()}>
+          <Button className="btn small" onClick={() => abort.current?.abort()}>
             Cancel upload
-          </button>
+          </Button>
         </div>
       )}
       {!uploading && pendingFile && (
-        <button
+        <Button
           className="btn small"
           onClick={() =>
             upload(pendingFile.file, pendingFile.key).catch(() => {})
           }
         >
           Retry upload
-        </button>
+        </Button>
       )}
       <div className="row">
         {q.data?.items.map((a) => (
           <div className="attachment-tile" key={a.id}>
-            <button className="file-open" onClick={() => setPreview(a)}>
+            <Button className="file-open" onClick={() => setPreview(a)}>
               <span className="file-glyph">
                 {a.preview_kind === "image"
                   ? "IMG"
@@ -1121,7 +1092,7 @@ function Files({ item }: { item: Item }) {
               </span>
               <strong className="small">{a.filename}</strong>
               <span className="small muted">{Math.ceil(a.size / 1024)} KB</span>
-            </button>
+            </Button>
             <div className="row">
               <a
                 className="small"
@@ -1131,7 +1102,7 @@ function Files({ item }: { item: Item }) {
                 Download
               </a>
               {can(item, "attachment", "delete") && (
-                <button
+                <Button
                   className="btn small ghost danger-text"
                   onClick={async () => {
                     if (await ask(`Permanently delete ${a.filename}?`))
@@ -1144,7 +1115,7 @@ function Files({ item }: { item: Item }) {
                   }}
                 >
                   Delete
-                </button>
+                </Button>
               )}
             </div>
           </div>
@@ -1185,9 +1156,9 @@ function FilePreview({
           >
             Download file
           </a>
-          <button className="btn primary" onClick={onClose}>
+          <Button className="btn primary" onClick={onClose}>
             Close
-          </button>
+          </Button>
         </>
       }
     >

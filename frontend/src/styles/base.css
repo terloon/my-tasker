@@ -72,6 +72,7 @@ a:hover {
   text-decoration: underline;
 }
 button:focus-visible,
+button.Mui-focusVisible,
 a:focus-visible,
 input:focus-visible,
 select:focus-visible,
@@ -356,11 +357,6 @@ body.embedded .app {
   font-size: 17px;
   width: 20px;
   text-align: center;
-}
-.project-switch {
-  margin: 0 6px;
-  width: calc(100% - 12px);
-  text-align: left;
 }
 .sidebar-bottom {
   margin-top: auto;
@@ -1082,27 +1078,22 @@ body.embedded .auth-page {
   width: 45%;
   height: 10px;
 }
-.overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 20;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 30px;
-  background: #09132280;
-}
 .modal {
-  width: min(100%, 540px);
-  max-height: calc(100vh - 60px);
-  overflow: auto;
+  width: min(540px, calc(100% - 40px));
+  max-width: none;
+  max-height: calc(100dvh - 40px);
+  margin: 20px;
   background: var(--raised);
+  color: var(--text);
   border: 1px solid var(--line);
   border-radius: 10px;
   box-shadow: var(--shadow);
 }
 .modal.wide {
-  width: min(100%, 820px);
+  width: min(820px, calc(100% - 40px));
+}
+.planner-backdrop {
+  background: #09132280;
 }
 .modal-head {
   padding: 22px 24px 0;
@@ -1116,31 +1107,29 @@ body.embedded .auth-page {
 }
 .modal-content {
   padding: 20px 24px 24px;
+  overflow-wrap: anywhere;
 }
 .modal-footer {
   padding: 16px 24px;
   display: flex;
+  flex-wrap: wrap;
+  flex-shrink: 0;
   justify-content: flex-end;
   gap: 10px;
   border-top: 1px solid var(--line);
   background: var(--surface);
-  position: sticky;
-  bottom: 0;
 }
 .modal-subtitle {
   margin-top: 6px;
   color: var(--muted);
   font-size: 13px;
 }
-.drawer-overlay {
-  justify-content: flex-end;
-  padding: 0;
-}
-.drawer {
-  height: 100vh;
-  max-height: 100vh;
+.modal.drawer {
+  margin: 0 0 0 auto;
+  height: 100dvh;
+  max-height: 100dvh;
   border-radius: 0;
-  width: min(100%, 460px);
+  width: min(460px, 100vw);
 }
 .secret {
   padding: 14px;
@@ -1442,11 +1431,13 @@ body.embedded .auth-page {
   .two-fields {
     grid-template-columns: 1fr;
   }
-  .overlay {
-    padding: 12px;
-  }
   .modal {
-    max-height: calc(100vh - 24px);
+    width: min(540px, calc(100% - 24px));
+    max-height: calc(100dvh - 24px);
+    margin: 12px;
+  }
+  .modal.wide {
+    width: min(820px, calc(100% - 24px));
   }
   .modal-head {
     padding: 20px 18px 0;

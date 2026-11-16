@@ -1,4 +1,6 @@
-import { ItemType } from "./ItemType";
+import { Button } from "./controls";
+import { ItemType, TypeIcon } from "./ItemType";
+import SelectField from "./SelectField";
 import { ask } from "./ui";
 import { useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
@@ -63,9 +65,9 @@ export function Home() {
         description="A clear view of your projects and current work."
         actions={
           user.is_admin && (
-            <button className="btn primary" onClick={() => setCreate(true)}>
+            <Button className="btn primary" onClick={() => setCreate(true)}>
               + New project
-            </button>
+            </Button>
           )
         }
       />
@@ -82,9 +84,9 @@ export function Home() {
           }
         >
           {user.is_admin ? (
-            <button className="btn primary" onClick={() => setCreate(true)}>
+            <Button className="btn primary" onClick={() => setCreate(true)}>
               Create project
-            </button>
+            </Button>
           ) : (
             "An administrator can grant you project access."
           )}
@@ -174,12 +176,12 @@ export function ProjectOverview() {
         actions={
           <>
             {can(p, "project", "update") && (
-              <button className="btn" onClick={() => setEdit(true)}>
+              <Button className="btn" onClick={() => setEdit(true)}>
                 Edit project
-              </button>
+              </Button>
             )}
             {user.is_admin && (
-              <button
+              <Button
                 className="btn ghost danger-text"
                 onClick={async () => {
                   if (
@@ -198,25 +200,25 @@ export function ProjectOverview() {
                 }}
               >
                 Delete project
-              </button>
+              </Button>
             )}
           </>
         }
       />
       {!!w.error && <ErrorBox error={w.error} />}
       <div className="tabs">
-        <button
+        <Button
           className={"tab " + (tab === "overview" ? "active" : "")}
           onClick={() => setTab("overview")}
         >
           Overview
-        </button>
-        <button
+        </Button>
+        <Button
           className={"tab " + (tab === "activity" ? "active" : "")}
           onClick={() => setTab("activity")}
         >
           Activity
-        </button>
+        </Button>
       </div>
       {tab === "activity" ? (
         <Activity projectId={p.id} />
@@ -353,30 +355,30 @@ export function ItemList() {
         description="Find work across projects you can access."
         actions={
           can(selectedProject, "item", "create") && (
-            <button className="btn primary" onClick={() => setCreate(true)}>
+            <Button className="btn primary" onClick={() => setCreate(true)}>
               + Create item
-            </button>
+            </Button>
           )
         }
       />
       <div className="filters">
         <div className="item-view-switch" role="group" aria-label="Item view">
-          <button
+          <Button
             className="btn small"
             type="button"
             aria-pressed={!hierarchy}
             onClick={() => hierarchy && setView("list")}
           >
             List
-          </button>
-          <button
+          </Button>
+          <Button
             className="btn small"
             type="button"
             aria-pressed={hierarchy}
             onClick={() => !hierarchy && setView("hierarchy")}
           >
             Hierarchy
-          </button>
+          </Button>
         </div>
         <input
           className="filter-input"
@@ -386,17 +388,17 @@ export function ItemList() {
           value={params.get("q") || ""}
           onChange={(e) => filter("q", [e.target.value])}
         />
-        <button className="filter-chip" onClick={() => setFilters(!filters)}>
+        <Button className="filter-chip" onClick={() => setFilters(!filters)}>
           Filters {filterCount > 0 && `(${filterCount})`} ⌄
-        </button>
-        <button
+        </Button>
+        <Button
           className="btn ghost small"
           onClick={() => setColumns(!columns)}
         >
           Columns
-        </button>
+        </Button>
         {filterCount > 0 && (
-          <button
+          <Button
             className="btn ghost small"
             onClick={() => {
               setCollapsed(new Set());
@@ -404,7 +406,7 @@ export function ItemList() {
             }}
           >
             Clear all
-          </button>
+          </Button>
         )}
       </div>
       {columns && (
@@ -480,36 +482,31 @@ export function ItemList() {
                 }
               />
             </label>
-            <label className="field">
-              <span>Sort</span>
-              <select
-                value={params.get("sort") || "updated_at"}
-                onChange={(e) => filter("sort", [e.target.value])}
-              >
-                {[
-                  "key",
-                  "title",
-                  "priority",
-                  "state",
-                  "created_at",
-                  "updated_at",
-                ].map((t) => (
-                  <option value={t} key={t}>
-                    {label(t)}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="field">
-              <span>Direction</span>
-              <select
-                value={params.get("direction") || "desc"}
-                onChange={(e) => filter("direction", [e.target.value])}
-              >
-                <option value="desc">Descending</option>
-                <option value="asc">Ascending</option>
-              </select>
-            </label>
+            <SelectField
+              title="Sort"
+              value={params.get("sort") || "updated_at"}
+              onChange={(value) => filter("sort", [value])}
+              options={[
+                "key",
+                "title",
+                "priority",
+                "state",
+                "created_at",
+                "updated_at",
+              ].map((s) => ({
+                value: s,
+                label: label(s),
+              }))}
+            />
+            <SelectField
+              title="Direction"
+              value={params.get("direction") || "desc"}
+              onChange={(value) => filter("direction", [value])}
+              options={[
+                { value: "desc", label: "Descending" },
+                { value: "asc", label: "Ascending" },
+              ]}
+            />
           </div>
           <div className="row">
             {[
@@ -539,7 +536,7 @@ export function ItemList() {
       {!!Object.keys(selected).length && (
         <div className="quiet-band between">
           <span>{Object.keys(selected).length} selected</span>
-          <button
+          <Button
             className="btn"
             disabled={
               new Set(Object.values(selected).map((i) => i.project_id)).size !==
@@ -548,10 +545,10 @@ export function ItemList() {
             onClick={() => setMoving(Object.values(selected))}
           >
             Move selected
-          </button>
-          <button className="btn ghost" onClick={() => setSelected({})}>
+          </Button>
+          <Button className="btn ghost" onClick={() => setSelected({})}>
             Clear selection
-          </button>
+          </Button>
         </div>
       )}
       <div className="section">
@@ -635,21 +632,18 @@ function Multi({
   onChange: (v: string[]) => void;
 }) {
   return (
-    <label className="field">
-      <span>{name}</span>
-      <select
+    <div>
+      <SelectField
+        title={name}
         multiple
         value={value}
-        onChange={(e) =>
-          onChange([...e.target.selectedOptions].map((o) => o.value))
-        }
-      >
-        {options.map(([v, t]) => (
-          <option key={v} value={v}>
-            {t}
-          </option>
-        ))}
-      </select>
+        onChange={onChange}
+        options={options.map(([value, label]) => ({
+          value,
+          label,
+          icon: itemTypes ? <TypeIcon type={value} /> : undefined,
+        }))}
+      />
       {itemTypes && (
         <span className="row type-filter-selection">
           {value.map((type) => (
@@ -657,7 +651,7 @@ function Multi({
           ))}
         </span>
       )}
-    </label>
+    </div>
   );
 }
 
@@ -681,9 +675,9 @@ function SprintOverview({
         <div className="section-head">
           <h2>Description</h2>
           {canEdit && (
-            <button className="btn ghost small" onClick={onEdit}>
+            <Button className="btn ghost small" onClick={onEdit}>
               {sprint.description ? "Edit description" : "Add description"}
-            </button>
+            </Button>
           )}
         </div>
         {sprint.description ? (
@@ -820,20 +814,18 @@ export function SprintBoard() {
         }
         actions={
           <>
-            <select
-              className="btn"
-              aria-label="Choose sprint"
+            <SelectField
+              ariaLabel="Choose sprint"
               value={sprint.id}
-              onChange={(e) =>
-                nav(`/projects/${id}/sprints/${e.target.value}?view=${view}`)
+              unavailableLabel={sprint.name}
+              onChange={(value) =>
+                nav(`/projects/${id}/sprints/${value}?view=${view}`)
               }
-            >
-              {sp.data?.items.map((s) => (
-                <option value={s.id} key={s.id}>
-                  {s.name}
-                </option>
-              ))}
-            </select>
+              options={
+                sp.data?.items.map((s) => ({ value: s.id, label: s.name })) ??
+                []
+              }
+            />
             <Link
               className="btn"
               to={`/projects/${id}/planning?sprint=${sprint.id}`}
@@ -841,17 +833,17 @@ export function SprintBoard() {
               Plan sprint
             </Link>
             {can(project, "sprint", "update") && (
-              <button className="btn" onClick={() => setEditing(true)}>
+              <Button className="btn" onClick={() => setEditing(true)}>
                 Edit sprint
-              </button>
+              </Button>
             )}
             {can(project, "sprint", "update") && sprint.state === "active" && (
-              <button className="btn primary" onClick={() => setClose(true)}>
+              <Button className="btn primary" onClick={() => setClose(true)}>
                 Close sprint
-              </button>
+              </Button>
             )}
             {can(project, "sprint", "update") && sprint.state === "planned" && (
-              <button
+              <Button
                 className="btn primary"
                 disabled={w.busy || !!sprint.counts?.open_question}
                 onClick={async () => {
@@ -865,7 +857,7 @@ export function SprintBoard() {
                 }}
               >
                 Start sprint
-              </button>
+              </Button>
             )}
           </>
         }
@@ -873,7 +865,7 @@ export function SprintBoard() {
       <SprintQuestionsNotice sprint={sprint} />
       <nav className="tabs" aria-label="Sprint views">
         {["overview", "board"].map((value) => (
-          <button
+          <Button
             key={value}
             className={"tab " + (view === value ? "active" : "")}
             aria-current={view === value ? "page" : undefined}
@@ -884,7 +876,7 @@ export function SprintBoard() {
             }}
           >
             {label(value)}
-          </button>
+          </Button>
         ))}
       </nav>
       {!!w.error && <ErrorBox error={w.error} />}{" "}
@@ -917,9 +909,9 @@ export function SprintBoard() {
             </label>
           )}
           {sprint.state !== "closed" && can(project, "item", "create") && (
-            <button className="btn small" onClick={() => setCreate(true)}>
+            <Button className="btn small" onClick={() => setCreate(true)}>
               + Create item
-            </button>
+            </Button>
           )}
         </div>
       </div>
@@ -1004,25 +996,21 @@ export function SprintBoard() {
                       </span>
                     </div>
                     {sprint.state !== "closed" && can(i, "item", "update") && (
-                      <select
+                      <SelectField
                         className="card-state"
-                        aria-label={"Change state of " + i.key}
+                        ariaLabel={"Change state of " + i.key}
                         value={i.state}
-                        onChange={(e) =>
-                          change(i, e.target.value).catch(() => {})
-                        }
-                      >
-                        {itemStateOptions(i.state).map((s) => (
-                          <option value={s} key={s}>
-                            {label(s)}
-                          </option>
-                        ))}
-                      </select>
+                        onChange={(value) => change(i, value).catch(() => {})}
+                        options={itemStateOptions(i.state).map((s) => ({
+                          value: s,
+                          label: label(s),
+                        }))}
+                      />
                     )}
                   </article>
                 ))}
                 {q.data!.columns[state].offset > 0 && (
-                  <button
+                  <Button
                     className="btn small ghost"
                     onClick={() =>
                       setOffsets((o) => ({
@@ -1032,11 +1020,11 @@ export function SprintBoard() {
                     }
                   >
                     Previous
-                  </button>
+                  </Button>
                 )}
                 {q.data!.columns[state].offset + q.data!.columns[state].limit <
                   q.data!.columns[state].total && (
-                  <button
+                  <Button
                     className="btn small ghost"
                     onClick={() =>
                       setOffsets((o) => ({
@@ -1046,7 +1034,7 @@ export function SprintBoard() {
                     }
                   >
                     Next 50
-                  </button>
+                  </Button>
                 )}
               </section>
             ))}

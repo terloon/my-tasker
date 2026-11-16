@@ -1,4 +1,6 @@
-import { ItemType, TypeSelect } from "./ItemType";
+import { Button } from "./controls";
+import { ItemType, TypeIcon } from "./ItemType";
+import SelectField from "./SelectField";
 import { Markdown } from "./Markdown";
 import { useRef, useState, type DragEvent } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
@@ -129,32 +131,32 @@ function ProjectPlanning({ projectId }: { projectId: string }) {
                   Board
                 </Link>
                 {can(project, "sprint", "update") && (
-                  <button className="btn" onClick={() => setEdit(sprint)}>
+                  <Button className="btn" onClick={() => setEdit(sprint)}>
                     Edit sprint
-                  </button>
+                  </Button>
                 )}
                 {can(project, "sprint", "update") &&
                   sprint.state === "planned" && (
-                    <button
+                    <Button
                       className="btn primary"
                       disabled={w.busy || !!sprint.counts?.open_question}
                       onClick={() => start(sprint).catch(() => {})}
                     >
                       Start sprint
-                    </button>
+                    </Button>
                   )}
                 {can(project, "sprint", "update") &&
                   sprint.state === "active" && (
-                    <button className="btn" onClick={() => setClosing(sprint)}>
+                    <Button className="btn" onClick={() => setClosing(sprint)}>
                       Close sprint
-                    </button>
+                    </Button>
                   )}
               </>
             ) : (
               can(project, "sprint", "create") && (
-                <button className="btn primary" onClick={() => setEdit("new")}>
+                <Button className="btn primary" onClick={() => setEdit("new")}>
                   + New sprint
-                </button>
+                </Button>
               )
             )}
           </>
@@ -173,12 +175,12 @@ function ProjectPlanning({ projectId }: { projectId: string }) {
             {activeSprint ? (
               <>
                 <h2>
-                  <button
+                  <Button
                     className="sprint-title-button"
                     onClick={() => selectSprint(activeSprint.id)}
                   >
                     {activeSprint.name}
-                  </button>
+                  </Button>
                 </h2>
                 {activeSprint.description && (
                   <Markdown compact>{activeSprint.description}</Markdown>
@@ -201,7 +203,7 @@ function ProjectPlanning({ projectId }: { projectId: string }) {
           </div>
           {activeSprint && (
             <div className="row planning-active-actions">
-              <button
+              <Button
                 className="btn primary small"
                 disabled={selectedId === activeSprint.id}
                 onClick={() => selectSprint(activeSprint.id)}
@@ -209,7 +211,7 @@ function ProjectPlanning({ projectId }: { projectId: string }) {
                 {selectedId === activeSprint.id
                   ? "Planning this sprint"
                   : "Plan active sprint"}
-              </button>
+              </Button>
               <Link
                 className="btn small"
                 to={`/projects/${projectId}/sprints/${activeSprint.id}?view=board`}
@@ -223,24 +225,24 @@ function ProjectPlanning({ projectId }: { projectId: string }) {
                 Overview
               </Link>
               {can(project, "sprint", "update") && (
-                <button
+                <Button
                   className="btn small"
                   onClick={() => setClosing(activeSprint)}
                 >
                   Close sprint
-                </button>
+                </Button>
               )}
             </div>
           )}
         </section>
       )}
       {selectedId && (
-        <button
+        <Button
           className="btn ghost planning-back"
           onClick={() => selectSprint(null)}
         >
           ← Sprint list
-        </button>
+        </Button>
       )}
       {!!w.error && (
         <ErrorBox error={w.error} retry={() => sprints.refetch()} />
@@ -248,7 +250,7 @@ function ProjectPlanning({ projectId }: { projectId: string }) {
       {!selectedId && (
         <nav className="tabs" aria-label="Sprint status">
           {(["planned", "closed"] as const).map((state) => (
-            <button
+            <Button
               key={state}
               className={"tab " + (stage === state ? "active" : "")}
               aria-current={stage === state ? "page" : undefined}
@@ -261,7 +263,7 @@ function ProjectPlanning({ projectId }: { projectId: string }) {
                 {sprints.data?.items.filter((s) => s.state === state).length ??
                   "…"}
               </span>
-            </button>
+            </Button>
           ))}
         </nav>
       )}
@@ -290,12 +292,12 @@ function ProjectPlanning({ projectId }: { projectId: string }) {
                 <div className="row">
                   <span className="sprint-number">{index + 1}</span>
                   <h2>
-                    <button
+                    <Button
                       className="sprint-title-button"
                       onClick={() => selectSprint(s.id)}
                     >
                       {s.name}
-                    </button>
+                    </Button>
                   </h2>
                   <span className="badge">{label(s.state)}</span>
                 </div>
@@ -319,12 +321,12 @@ function ProjectPlanning({ projectId }: { projectId: string }) {
                 )}
               </div>
               <div className="sprint-summary-actions">
-                <button
+                <Button
                   className="btn primary small"
                   onClick={() => selectSprint(s.id)}
                 >
                   {s.state === "closed" ? "View plan" : "Plan sprint"}
-                </button>
+                </Button>
                 <Link
                   className="btn small"
                   to={`/projects/${projectId}/sprints/${s.id}?view=overview`}
@@ -333,23 +335,23 @@ function ProjectPlanning({ projectId }: { projectId: string }) {
                 </Link>
                 {can(project, "sprint", "update") && (
                   <>
-                    <button
+                    <Button
                       className="btn ghost small"
                       onClick={() => setEdit(s)}
                     >
                       Edit
-                    </button>
+                    </Button>
                     {stage !== "closed" && (
                       <>
-                        <button
+                        <Button
                           className="btn ghost small"
                           aria-label={`Move ${s.name} up`}
                           disabled={!index || w.busy}
                           onClick={() => reorder(s.id, -1).catch(() => {})}
                         >
                           ↑
-                        </button>
-                        <button
+                        </Button>
+                        <Button
                           className="btn ghost small"
                           aria-label={`Move ${s.name} down`}
                           disabled={
@@ -358,13 +360,13 @@ function ProjectPlanning({ projectId }: { projectId: string }) {
                           onClick={() => reorder(s.id, 1).catch(() => {})}
                         >
                           ↓
-                        </button>
+                        </Button>
                       </>
                     )}
                   </>
                 )}
                 {s.state === "planned" && can(project, "sprint", "delete") && (
-                  <button
+                  <Button
                     className="btn ghost small danger-text"
                     disabled={w.busy}
                     onClick={async () => {
@@ -382,7 +384,7 @@ function ProjectPlanning({ projectId }: { projectId: string }) {
                     }}
                   >
                     Delete
-                  </button>
+                  </Button>
                 )}
               </div>
             </article>
@@ -529,7 +531,7 @@ function SprintWorkspace({ sprint }: { sprint: Sprint }) {
     const hasQuestion = item.state === "open_question";
     if (!hasQuestion && item.state !== "open") return null;
     return (
-      <button
+      <Button
         className="btn small ghost"
         disabled={w.busy}
         aria-label={
@@ -560,7 +562,7 @@ function SprintWorkspace({ sprint }: { sprint: Sprint }) {
         }}
       >
         {hasQuestion ? "Return to Open" : "Flag question"}
-      </button>
+      </Button>
     );
   }
   async function move(backlogItems: Item[], destination: string | null) {
@@ -782,7 +784,7 @@ function SprintWorkspace({ sprint }: { sprint: Sprint }) {
             </p>
           </div>
           <div className="row planning-items-actions">
-            <button
+            <Button
               className="btn small"
               aria-pressed={questionsOnly}
               onClick={() => {
@@ -793,11 +795,11 @@ function SprintWorkspace({ sprint }: { sprint: Sprint }) {
               }}
             >
               Open questions <span className="count">{questions.length}</span>
-            </button>
+            </Button>
             {sprint.state !== "closed" && can(project, "item", "create") && (
-              <button className="btn small" onClick={() => setCreate("sprint")}>
+              <Button className="btn small" onClick={() => setCreate("sprint")}>
                 + Create item
-              </button>
+              </Button>
             )}
           </div>
         </div>
@@ -844,7 +846,7 @@ function SprintWorkspace({ sprint }: { sprint: Sprint }) {
                     {editable && questionAction(item)}
                     {editable && (
                       <>
-                        <button
+                        <Button
                           className="btn small ghost"
                           disabled={!index || w.busy}
                           aria-label={`Move ${item.key} up`}
@@ -853,8 +855,8 @@ function SprintWorkspace({ sprint }: { sprint: Sprint }) {
                           }
                         >
                           ↑
-                        </button>
-                        <button
+                        </Button>
+                        <Button
                           className="btn small ghost"
                           disabled={index === visibleItems.length - 1 || w.busy}
                           aria-label={`Move ${item.key} down`}
@@ -863,24 +865,24 @@ function SprintWorkspace({ sprint }: { sprint: Sprint }) {
                           }
                         >
                           ↓
-                        </button>
+                        </Button>
                       </>
                     )}
-                    <button
+                    <Button
                       className="btn small ghost"
                       disabled={w.busy}
                       onClick={() => setMoving([item])}
                     >
                       Move
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       className="btn small ghost"
                       disabled={w.busy}
                       aria-label={`Move ${item.key} to backlog`}
                       onClick={() => move([item], null)}
                     >
                       To backlog
-                    </button>
+                    </Button>
                   </div>
                 )}
               </li>
@@ -931,9 +933,9 @@ function SprintWorkspace({ sprint }: { sprint: Sprint }) {
             </p>
           </div>
           {can(project, "item", "create") && (
-            <button className="btn small" onClick={() => setCreate("backlog")}>
+            <Button className="btn small" onClick={() => setCreate("backlog")}>
               + Create backlog item
-            </button>
+            </Button>
           )}
         </div>
         {backlogEditable && (
@@ -964,77 +966,65 @@ function SprintWorkspace({ sprint }: { sprint: Sprint }) {
               onChange={(e) => filter("q", e.target.value)}
             />
           </Field>
-          <Field name="Type">
-            <TypeSelect
-              value={filters.type}
-              onChange={(e) => filter("type", e.target.value)}
-            >
-              <option value="">All types</option>
-              {types.map((t) => (
-                <option key={t} value={t}>
-                  {label(t)}
-                </option>
-              ))}
-            </TypeSelect>
-          </Field>
-          <Field name="State">
-            <select
-              value={filters.state}
-              onChange={(e) => filter("state", e.target.value)}
-            >
-              <option value="">All states</option>
-              {states.map((s) => (
-                <option key={s} value={s}>
-                  {label(s)}
-                </option>
-              ))}
-            </select>
-          </Field>
-          <Field name="Priority">
-            <select
-              value={filters.priority}
-              onChange={(e) => filter("priority", e.target.value)}
-            >
-              <option value="">All priorities</option>
-              {priorities.map((p) => (
-                <option key={p} value={p}>
-                  {label(p)}
-                </option>
-              ))}
-            </select>
-          </Field>
-          <Field name="Assignee">
-            <select
-              value={filters.assignee}
-              onChange={(e) => filter("assignee", e.target.value)}
-            >
-              <option value="">Anyone</option>
-              <option value="unassigned">Unassigned</option>
-              {assignees.data?.map((u) => (
-                <option key={u.id} value={u.id}>
-                  {u.display_name}
-                </option>
-              ))}
-            </select>
-          </Field>
-          <Field name="Label">
-            <select
-              value={filters.label}
-              onChange={(e) => filter("label", e.target.value)}
-            >
-              <option value="">All labels</option>
-              {labels.data?.map((l) => (
-                <option key={l.id} value={l.id}>
-                  {l.name}
-                </option>
-              ))}
-            </select>
-          </Field>
+          <SelectField
+            title="Type"
+            value={filters.type}
+            onChange={(value) => filter("type", value)}
+            options={[
+              { value: "", label: "All types" },
+              ...types.map((t) => ({
+                value: t,
+                label: label(t),
+                icon: <TypeIcon type={t} />,
+              })),
+            ]}
+          />
+          <SelectField
+            title="State"
+            value={filters.state}
+            onChange={(value) => filter("state", value)}
+            options={[
+              { value: "", label: "All states" },
+              ...states.map((s) => ({ value: s, label: label(s) })),
+            ]}
+          />
+          <SelectField
+            title="Priority"
+            value={filters.priority}
+            onChange={(value) => filter("priority", value)}
+            options={[
+              { value: "", label: "All priorities" },
+              ...priorities.map((p) => ({ value: p, label: label(p) })),
+            ]}
+          />
+          <SelectField
+            title="Assignee"
+            value={filters.assignee}
+            onChange={(value) => filter("assignee", value)}
+            options={[
+              { value: "", label: "Anyone" },
+              { value: "unassigned", label: "Unassigned" },
+              ...(assignees.data?.map((u) => ({
+                value: u.id,
+                label: u.display_name,
+              })) ?? []),
+            ]}
+          />
+          <SelectField
+            title="Label"
+            value={filters.label}
+            onChange={(value) => filter("label", value)}
+            options={[
+              { value: "", label: "All labels" },
+              ...(labels.data?.map((l) => ({ value: l.id, label: l.name })) ??
+                []),
+            ]}
+          />
         </div>
         {(Object.values(filters).some(Boolean) ||
           !!Object.keys(selected).length) && (
           <div className="between planning-filter-actions">
-            <button
+            <Button
               className="btn ghost small"
               onClick={() => {
                 const next = new URLSearchParams(params);
@@ -1044,15 +1034,15 @@ function SprintWorkspace({ sprint }: { sprint: Sprint }) {
               }}
             >
               Clear filters
-            </button>
+            </Button>
             {editable && !!Object.keys(selected).length && (
-              <button
+              <Button
                 className="btn primary small"
                 disabled={w.busy}
                 onClick={() => move(Object.values(selected), sprint.id)}
               >
                 Add {Object.keys(selected).length} selected to sprint
-              </button>
+              </Button>
             )}
           </div>
         )}
@@ -1111,7 +1101,7 @@ function SprintWorkspace({ sprint }: { sprint: Sprint }) {
                 {backlogEditable && (
                   <div className="planning-row-actions">
                     {questionAction(item)}
-                    <button
+                    <Button
                       className="btn small ghost"
                       title="Move to top of backlog"
                       aria-label={`Move ${item.key} to top of backlog`}
@@ -1123,8 +1113,8 @@ function SprintWorkspace({ sprint }: { sprint: Sprint }) {
                       onClick={() => moveBacklog(item, index, "top")}
                     >
                       ⇈
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       className="btn small ghost"
                       title="Move up"
                       aria-label={`Move ${item.key} up in backlog`}
@@ -1134,8 +1124,8 @@ function SprintWorkspace({ sprint }: { sprint: Sprint }) {
                       onClick={() => moveBacklog(item, index, -1)}
                     >
                       ↑
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       className="btn small ghost"
                       title="Move down"
                       aria-label={`Move ${item.key} down in backlog`}
@@ -1147,15 +1137,15 @@ function SprintWorkspace({ sprint }: { sprint: Sprint }) {
                       onClick={() => moveBacklog(item, index, 1)}
                     >
                       ↓
-                    </button>
+                    </Button>
                     {editable && (
-                      <button
+                      <Button
                         className="btn small"
                         disabled={w.busy}
                         onClick={() => move([item], sprint.id)}
                       >
                         Add to sprint ↑
-                      </button>
+                      </Button>
                     )}
                   </div>
                 )}
@@ -1197,7 +1187,7 @@ function SprintWorkspace({ sprint }: { sprint: Sprint }) {
         {(assignees.error || labels.error) && (
           <p className="small muted">
             Some filter options could not be loaded.{" "}
-            <button
+            <Button
               className="btn ghost small"
               onClick={() => {
                 assignees.refetch();
@@ -1205,7 +1195,7 @@ function SprintWorkspace({ sprint }: { sprint: Sprint }) {
               }}
             >
               Retry options
-            </button>
+            </Button>
           </p>
         )}
       </section>
