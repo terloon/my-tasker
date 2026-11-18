@@ -1,11 +1,11 @@
-import { ApiError, type Item } from "./api/client";
+import { ApiError } from "./api/client";
 
 /** Move within a complete, versioned list snapshot; null means the end. */
-export function orderBefore(
-  items: Item[],
+export function orderBefore<T extends { id: string }>(
+  items: T[],
   itemId: string,
   beforeId: string | null,
-): Item[] {
+): T[] {
   const source = items.find((i) => i.id === itemId);
   if (!source || (beforeId !== null && !items.some((i) => i.id === beforeId)))
     throw new ApiError(
@@ -24,11 +24,11 @@ export function orderBefore(
 }
 
 /** Place after a visible neighbor while preserving hidden items' relative order. */
-export function orderAfter(
-  items: Item[],
+export function orderAfter<T extends { id: string }>(
+  items: T[],
   itemId: string,
   afterId: string,
-): Item[] {
+): T[] {
   if (!items.some((i) => i.id === afterId))
     return orderBefore(items, itemId, afterId);
   if (itemId === afterId) return orderBefore(items, itemId, afterId);

@@ -434,7 +434,7 @@ export function ItemTable(props: ItemTableProps) {
                 </td>
                 {extra && (
                   <>
-                    <td className="item-sprint-cell">{i.sprint_name}</td>
+                    <td className="item-sprint-cell">{i.sprint_title}</td>
                     <td>
                       {i.labels.map((l) => (
                         <span key={l.id} className="label">

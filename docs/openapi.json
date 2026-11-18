@@ -4896,6 +4896,10 @@
             "type": "string",
             "title": "Sprint Name"
           },
+          "sprint_title": {
+            "type": "string",
+            "title": "Sprint Title"
+          },
           "sprint_state": {
             "anyOf": [
               {
@@ -5004,6 +5008,7 @@
           "priority",
           "sprint_id",
           "sprint_name",
+          "sprint_title",
           "sprint_state",
           "assignee_id",
           "assignee",
@@ -5217,6 +5222,10 @@
             "type": "string",
             "title": "Sprint Name"
           },
+          "sprint_title": {
+            "type": "string",
+            "title": "Sprint Title"
+          },
           "sprint_state": {
             "anyOf": [
               {
@@ -5302,6 +5311,7 @@
           "priority",
           "sprint_id",
           "sprint_name",
+          "sprint_title",
           "sprint_state",
           "assignee_id",
           "assignee",
@@ -5894,6 +5904,14 @@
             "type": "string",
             "title": "Name"
           },
+          "number": {
+            "type": "integer",
+            "title": "Number"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
           "description": {
             "type": "string",
             "title": "Description"
@@ -5969,6 +5987,8 @@
           "id",
           "project_id",
           "name",
+          "number",
+          "title",
           "description",
           "state",
           "position",

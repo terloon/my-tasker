@@ -968,6 +968,8 @@ export interface components {
             sprint_id: string | null;
             /** Sprint Name */
             sprint_name: string;
+            /** Sprint Title */
+            sprint_title: string;
             /** Sprint State */
             sprint_state: string | null;
             /** Assignee Id */
@@ -1080,6 +1082,8 @@ export interface components {
             sprint_id: string | null;
             /** Sprint Name */
             sprint_name: string;
+            /** Sprint Title */
+            sprint_title: string;
             /** Sprint State */
             sprint_state: string | null;
             /** Assignee Id */
@@ -1281,6 +1285,10 @@ export interface components {
             project_id: string;
             /** Name */
             name: string;
+            /** Number */
+            number: number;
+            /** Title */
+            title: string;
             /** Description */
             description: string;
             /**

@@ -240,6 +240,7 @@ class ItemOut(Output):
     priority: Priority
     sprint_id: str | None
     sprint_name: str
+    sprint_title: str
     sprint_state: str | None
     assignee_id: str | None
     assignee: UserOut | None
@@ -256,6 +257,8 @@ class SprintOut(Output):
     id: str
     project_id: str
     name: str
+    number: int
+    title: str
     description: str
     state: Literal["planned", "active", "closed"]
     position: int

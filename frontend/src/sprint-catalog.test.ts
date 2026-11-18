@@ -42,4 +42,37 @@ describe("sprint lifecycle views", () => {
       "sprint list changed",
     );
   });
+  it("moves a sprint before or after a nonadjacent card without moving other states", () => {
+    const third = { id: "third", state: "planned", version: 3 } as Sprint;
+    const snapshot = [...all, third];
+    const moved = reorderSprintStage(snapshot, "planned", "first", {
+      targetId: "third",
+      side: "after",
+    });
+    expect(moved.map((s) => s.id)).toEqual([
+      "closed",
+      "second",
+      "active",
+      "third",
+      "first",
+    ]);
+    expect(
+      reorderSprintStage(moved, "planned", "first", {
+        targetId: "second",
+        side: "before",
+      }),
+    ).toEqual(snapshot);
+    expect(
+      reorderSprintStage(snapshot, "planned", "first", {
+        targetId: "second",
+        side: "before",
+      }),
+    ).toBe(snapshot);
+    expect(() =>
+      reorderSprintStage(snapshot, "planned", "first", {
+        targetId: "active",
+        side: "after",
+      }),
+    ).toThrow("list changed");
+  });
 });

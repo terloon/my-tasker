@@ -167,7 +167,7 @@ export function SprintEditor({
     >
       <div className="stack">
         {!!w.error && <ErrorBox error={w.error} />}
-        <Field name="Name">
+        <Field name="Name" hint="The sprint number is assigned automatically.">
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -374,7 +374,7 @@ export function ItemEditor({
               { value: "", label: "Backlog" },
               ...(sp.data?.items
                 .filter((s) => s.state !== "closed")
-                .map((s) => ({ value: s.id, label: s.name })) ?? []),
+                .map((s) => ({ value: s.id, label: s.title })) ?? []),
             ]}
           />
           <SelectField
@@ -454,7 +454,7 @@ export function CandidatePicker({
               <span className="grow">
                 <span className="key">{i.key}</span> {i.title}
                 <span className="small muted" style={{ display: "block" }}>
-                  {i.sprint_name}
+                  {i.sprint_title}
                 </span>
               </span>
               <State state={i.state} />
@@ -538,7 +538,7 @@ export function MoveDialog({
             { value: "", label: "Backlog" },
             ...(sp.data?.items
               .filter((s) => s.state !== "closed")
-              .map((s) => ({ value: s.id, label: s.name })) ?? []),
+              .map((s) => ({ value: s.id, label: s.title })) ?? []),
           ]}
         />
         <p>
@@ -774,7 +774,7 @@ export function CloseSprint({
   return (
     <Modal
       title="Close sprint"
-      subtitle={sprint.name}
+      subtitle={sprint.title}
       wide
       onClose={onClose}
       footer={
@@ -847,7 +847,7 @@ export function CloseSprint({
                 { value: "", label: "Choose another sprint" },
                 ...(q.data?.destinations.map((s) => ({
                   value: s.id,
-                  label: s.name,
+                  label: s.title,
                 })) ?? []),
               ]}
             />

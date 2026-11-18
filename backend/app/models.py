@@ -127,6 +127,7 @@ sprints = Table(
     Column("name", String, nullable=False),
     Column("description", Text, nullable=False, default="", server_default=""),
     Column("position", Integer, nullable=False),
+    Column("number", Integer, nullable=False, server_default="0"),
     Column("state", String, nullable=False, default="planned"),
     Column("started_at", String),
     Column("closed_at", String),
@@ -144,6 +145,7 @@ Index(
     unique=True,
     sqlite_where=text("state = 'active'"),
 )
+Index("sprint_project_id_number", sprints.c.project_id, sprints.c.number, unique=True)
 items = Table(
     "items",
     metadata,

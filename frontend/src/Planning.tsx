@@ -41,7 +41,11 @@ import {
 } from "./ui";
 import { CloseSprint, ItemEditor, MoveDialog, SprintEditor } from "./dialogs";
 import { orderAfter, orderBefore } from "./planning-order";
-import { reorderSprintStage, sprintStage } from "./sprint-catalog";
+import {
+  reorderSprintStage,
+  sprintStage,
+  type SprintPlacement,
+} from "./sprint-catalog";
 
 type Drag = { item: Item; origin: "sprint" | "backlog"; snapshot: Item[] };
 
@@ -57,6 +61,12 @@ function ProjectPlanning({ projectId }: { projectId: string }) {
   const stage = sprintStage(params.get("sprint_state"));
   const [edit, setEdit] = useState<Sprint | "new" | null>(null);
   const [closing, setClosing] = useState<Sprint | null>(null);
+  const draggingSprint = useRef<{
+    id: string;
+    snapshot: Sprint[];
+  } | null>(null);
+  const [draggedSprintId, setDraggedSprintId] = useState<string | null>(null);
+  const [sprintDrop, setSprintDrop] = useState<SprintPlacement | null>(null);
   const sprints = useCollection<Sprint>(
     ["planning-sprints", projectId],
     `/projects/${projectId}/sprints`,
@@ -66,6 +76,10 @@ function ProjectPlanning({ projectId }: { projectId: string }) {
   const activeSprint = sprints.data?.items.find((s) => s.state === "active");
   const visibleSprints =
     sprints.data?.items.filter((s) => s.state === stage) || [];
+  const canDragSprints =
+    stage === "planned" &&
+    can(project, "sprint", "update") &&
+    visibleSprints.length > 1;
   const w = useWrite();
   const selectSprint = (id: string | null) =>
     setParams({
@@ -73,7 +87,9 @@ function ProjectPlanning({ projectId }: { projectId: string }) {
       ...(id ? { sprint: id } : {}),
     });
   async function start(s: Sprint) {
-    if (await ask(`Start ${s.name}? This becomes the project's active sprint.`))
+    if (
+      await ask(`Start ${s.title}? This becomes the project's active sprint.`)
+    )
       await w.execute(() =>
         api(`/sprints/${s.id}/start`, {
           method: "POST",
@@ -82,16 +98,74 @@ function ProjectPlanning({ projectId }: { projectId: string }) {
         }),
       );
   }
-  async function reorder(id: string, delta: -1 | 1) {
-    const all = reorderSprintStage(sprints.data!.items, stage, id, delta);
-    await w.execute(() =>
-      api(`/projects/${projectId}/sprint-order`, {
-        method: "PUT",
-        body: {
-          ordered_ids: all.map((s) => s.id),
-          versions: Object.fromEntries(all.map((s) => [s.id, s.version])),
-        },
-      }),
+  async function reorder(
+    snapshot: Sprint[],
+    id: string,
+    move: SprintPlacement,
+  ) {
+    if (!canDragSprints || w.busy) return;
+    try {
+      const ordered = reorderSprintStage(snapshot, stage, id, move);
+      if (ordered === snapshot) return;
+      await w.execute(() =>
+        api(`/projects/${projectId}/sprint-order`, {
+          method: "PUT",
+          body: {
+            ordered_ids: ordered.map((s) => s.id),
+            versions: Object.fromEntries(
+              snapshot.map((s) => [s.id, s.version]),
+            ),
+          },
+        }),
+      );
+    } catch (error) {
+      w.setError(error);
+      void sprints.refetch();
+    }
+  }
+  function beginSprintDrag(event: DragEvent, sprint: Sprint) {
+    if (!canDragSprints || w.busy || !sprints.data) {
+      event.preventDefault();
+      return;
+    }
+    event.dataTransfer.effectAllowed = "move";
+    event.dataTransfer.setData("text/plain", sprint.title);
+    const bounds = event.currentTarget.getBoundingClientRect();
+    event.dataTransfer.setDragImage(
+      event.currentTarget,
+      event.clientX - bounds.left,
+      event.clientY - bounds.top,
+    );
+    draggingSprint.current = { id: sprint.id, snapshot: sprints.data.items };
+    setDraggedSprintId(sprint.id);
+  }
+  function endSprintDrag() {
+    draggingSprint.current = null;
+    setDraggedSprintId(null);
+    setSprintDrop(null);
+  }
+  function sprintPlacement(
+    event: DragEvent,
+    targetId: string,
+  ): SprintPlacement | null {
+    const current = draggingSprint.current;
+    if (!current || !canDragSprints || w.busy || current.id === targetId)
+      return null;
+    event.preventDefault();
+    const bounds = event.currentTarget.getBoundingClientRect();
+    return {
+      targetId,
+      side: event.clientY < bounds.top + bounds.height / 2 ? "before" : "after",
+    };
+  }
+  function previewSprintDrop(event: DragEvent, targetId: string) {
+    const placement = sprintPlacement(event, targetId);
+    if (!placement) return;
+    event.dataTransfer.dropEffect = "move";
+    setSprintDrop((previous) =>
+      previous?.targetId === targetId && previous.side === placement.side
+        ? previous
+        : placement,
     );
   }
   if (!can(project, "sprint"))
@@ -103,7 +177,7 @@ function ProjectPlanning({ projectId }: { projectId: string }) {
   return (
     <>
       <Heading
-        title={sprint ? sprint.name : "Planning"}
+        title={sprint ? sprint.title : "Planning"}
         description={
           sprint ? (
             <>
@@ -179,7 +253,7 @@ function ProjectPlanning({ projectId }: { projectId: string }) {
                     className="sprint-title-button"
                     onClick={() => selectSprint(activeSprint.id)}
                   >
-                    {activeSprint.name}
+                    {activeSprint.title}
                   </Button>
                 </h2>
                 {activeSprint.description && (
@@ -280,23 +354,49 @@ function ProjectPlanning({ projectId }: { projectId: string }) {
           </Empty>
         )
       ) : visibleSprints.length ? (
-        <div className="sprint-catalog" aria-label="Project sprints">
-          {visibleSprints.map((s, index) => (
+        <div
+          className="sprint-catalog"
+          aria-label="Project sprints"
+          data-sorting={draggedSprintId ? "" : undefined}
+        >
+          {visibleSprints.map((s) => (
             <article
-              className={
-                "sprint-summary " + (s.state === "active" ? "is-active" : "")
+              className={`sprint-summary ${draggedSprintId === s.id ? "is-dragging" : ""}`}
+              draggable={canDragSprints && !w.busy}
+              onDragStart={(event) => beginSprintDrag(event, s)}
+              onDragEnd={endSprintDrag}
+              data-drop-side={
+                sprintDrop?.targetId === s.id ? sprintDrop.side : undefined
               }
               key={s.id}
+              onDragEnter={(event) => previewSprintDrop(event, s.id)}
+              onDragOver={(event) => previewSprintDrop(event, s.id)}
+              onDragLeave={() => {
+                setSprintDrop((previous) =>
+                  previous?.targetId === s.id ? null : previous,
+                );
+              }}
+              onDrop={(event) => {
+                const current = draggingSprint.current;
+                const placement = sprintPlacement(event, s.id);
+                endSprintDrag();
+                if (current && placement)
+                  void reorder(current.snapshot, current.id, placement);
+              }}
             >
               <div className="sprint-summary-main">
                 <div className="row">
-                  <span className="sprint-number">{index + 1}</span>
+                  {canDragSprints && (
+                    <span className="drag-handle" aria-hidden="true">
+                      ⠿
+                    </span>
+                  )}
                   <h2>
                     <Button
                       className="sprint-title-button"
                       onClick={() => selectSprint(s.id)}
                     >
-                      {s.name}
+                      {s.title}
                     </Button>
                   </h2>
                   <span className="badge">{label(s.state)}</span>
@@ -334,36 +434,12 @@ function ProjectPlanning({ projectId }: { projectId: string }) {
                   View sprint
                 </Link>
                 {can(project, "sprint", "update") && (
-                  <>
-                    <Button
-                      className="btn ghost small"
-                      onClick={() => setEdit(s)}
-                    >
-                      Edit
-                    </Button>
-                    {stage !== "closed" && (
-                      <>
-                        <Button
-                          className="btn ghost small"
-                          aria-label={`Move ${s.name} up`}
-                          disabled={!index || w.busy}
-                          onClick={() => reorder(s.id, -1).catch(() => {})}
-                        >
-                          ↑
-                        </Button>
-                        <Button
-                          className="btn ghost small"
-                          aria-label={`Move ${s.name} down`}
-                          disabled={
-                            index === visibleSprints.length - 1 || w.busy
-                          }
-                          onClick={() => reorder(s.id, 1).catch(() => {})}
-                        >
-                          ↓
-                        </Button>
-                      </>
-                    )}
-                  </>
+                  <Button
+                    className="btn ghost small"
+                    onClick={() => setEdit(s)}
+                  >
+                    Edit
+                  </Button>
                 )}
                 {s.state === "planned" && can(project, "sprint", "delete") && (
                   <Button
@@ -372,7 +448,7 @@ function ProjectPlanning({ projectId }: { projectId: string }) {
                     onClick={async () => {
                       if (
                         await ask(
-                          `Delete ${s.name}? Only empty, not-started sprints can be removed.`,
+                          `Delete ${s.title}? Only empty, not-started sprints can be removed.`,
                         )
                       )
                         w.execute(() =>
@@ -412,6 +488,30 @@ function ProjectPlanning({ projectId }: { projectId: string }) {
         <CloseSprint sprint={closing} onClose={() => setClosing(null)} />
       )}
     </>
+  );
+}
+
+function PlanningItemTitle({
+  item,
+  planningSearch,
+}: {
+  item: Item;
+  planningSearch: string;
+}) {
+  return (
+    <div className="planning-work-title">
+      <ItemLink item={item} planningSearch={planningSearch} />
+      <div className="row small muted">
+        <ItemType type={item.type} />
+        <span>{label(item.priority)} priority</span>
+        <BlockerBadge item={item} />
+        {item.labels.map((itemLabel) => (
+          <span className="label" key={itemLabel.id}>
+            {itemLabel.name}
+          </span>
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -831,14 +931,10 @@ function SprintWorkspace({ sprint }: { sprint: Sprint }) {
                   {editable ? "⠿" : index + 1}
                 </span>
                 <span className="key">{item.key}</span>
-                <div className="planning-work-title">
-                  <ItemLink item={item} planningSearch={planningSearch} />
-                  <div className="row small muted">
-                    <ItemType type={item.type} />
-                    <span>{label(item.priority)} priority</span>
-                    <BlockerBadge item={item} />
-                  </div>
-                </div>
+                <PlanningItemTitle
+                  item={item}
+                  planningSearch={planningSearch}
+                />
                 <State state={item.state} />
                 <Person user={item.assignee} />
                 {can(project, "item", "update") && (
@@ -1088,14 +1184,10 @@ function SprintWorkspace({ sprint }: { sprint: Sprint }) {
                   )}
                   {item.key}
                 </span>
-                <div className="planning-work-title">
-                  <ItemLink item={item} planningSearch={planningSearch} />
-                  <div className="row small muted">
-                    <ItemType type={item.type} />
-                    <span>{label(item.priority)} priority</span>
-                    <BlockerBadge item={item} />
-                  </div>
-                </div>
+                <PlanningItemTitle
+                  item={item}
+                  planningSearch={planningSearch}
+                />
                 <State state={item.state} />
                 <Person user={item.assignee} />
                 {backlogEditable && (

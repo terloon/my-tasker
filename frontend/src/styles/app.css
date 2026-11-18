@@ -403,6 +403,7 @@ h1[tabindex="-1"]:focus {
   gap: 14px;
 }
 .sprint-summary {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -412,17 +413,24 @@ h1[tabindex="-1"]:focus {
   border-radius: 8px;
   background: var(--surface);
 }
-.sprint-summary.is-active {
-  border-left: 3px solid var(--accent);
+.sprint-summary[data-drop-side="before"]::before {
+  top: -9px;
+}
+.sprint-summary[data-drop-side="after"]::before {
+  bottom: -9px;
+}
+.sprint-summary[draggable="true"] {
+  cursor: grab;
+}
+.sprint-summary[draggable="true"]:active {
+  cursor: grabbing;
+}
+.sprint-catalog[data-sorting] .sprint-summary > * {
+  pointer-events: none;
 }
 .sprint-summary-main {
   min-width: 0;
   flex: 1;
-}
-.sprint-number {
-  font-size: 12px;
-  color: var(--muted);
-  min-width: 18px;
 }
 .sprint-title-button {
   border: 0;
@@ -503,18 +511,23 @@ h1[tabindex="-1"]:focus {
 .planning-work-row:hover {
   background: var(--bg);
 }
-.planning-work-row.is-dragging {
+.planning-work-row.is-dragging,
+.sprint-summary.is-dragging {
   opacity: 0.5;
 }
-.planning-work-row.drop-before::before {
+.planning-work-row.drop-before::before,
+.sprint-summary[data-drop-side]::before {
   content: "";
   position: absolute;
-  top: -2px;
   left: 18px;
   right: 18px;
   height: 3px;
   background: var(--accent);
   border-radius: 2px;
+  pointer-events: none;
+}
+.planning-work-row.drop-before::before {
+  top: -2px;
 }
 .planning-work-title {
   min-width: 0;
@@ -552,6 +565,9 @@ h1[tabindex="-1"]:focus {
 .planning-work-title > .row {
   margin-top: 5px;
   gap: 10px;
+}
+.planning-work-title .label {
+  white-space: normal;
 }
 .planning-row-actions {
   display: flex;
@@ -713,6 +729,7 @@ h1[tabindex="-1"]:focus {
   gap: 6px;
 }
 .planning-work-row[draggable="true"],
+.sprint-summary[draggable="true"],
 .drag-handle {
   user-select: none;
 }

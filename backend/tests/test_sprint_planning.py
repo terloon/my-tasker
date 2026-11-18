@@ -10,6 +10,57 @@ from conftest import create, item, patch
 from sqlalchemy import select
 
 
+def test_sprint_numbers_follow_planning_order_and_freeze_on_start(client, project):
+    path = f"/projects/{project['id']}"
+    first = create(client, f"{path}/sprints", {"name": "First draft"})
+    second = create(client, f"{path}/sprints", {"name": "Sprint 9 - Core workflow"})
+    third = create(client, f"{path}/sprints", {"name": "Follow-up"})
+    assert [(s["number"], s["title"]) for s in (first, second, third)] == [
+        (1, "S1 First draft"),
+        (2, "S2 Sprint 9 - Core workflow"),
+        (3, "S3 Follow-up"),
+    ]
+    work = item(client, project, sprint_id=second["id"])
+    order = {
+        "ordered_ids": [s["id"] for s in (second, first, third)],
+        "versions": {s["id"]: s["version"] for s in (first, second, third)},
+    }
+    assert client.put(f"/api/v1{path}/sprint-order", json=order).status_code == 200
+
+    def sprints():
+        return client.get(f"/api/v1{path}/sprints").json()["items"]
+
+    assert [(s["id"], s["number"]) for s in sprints()] == [
+        (second["id"], 1),
+        (first["id"], 2),
+        (third["id"], 3),
+    ]
+    work = client.get(f"/api/v1/items/{work['id']}").json()
+    assert work["sprint_name"] == "Sprint 9 - Core workflow"
+    assert work["sprint_title"] == "S1 Sprint 9 - Core workflow"
+
+    # Starting a later sprint promotes it to the next number.
+    started = client.post(
+        f"/api/v1/sprints/{third['id']}/start", json={"expected_version": sprints()[2]["version"]}
+    ).json()
+    assert started["number"] == 1
+    closed = client.post(
+        f"/api/v1/sprints/{third['id']}/close", json={"expected_version": started["version"]}
+    ).json()
+    assert (closed["number"], closed["state"]) == (1, "closed")
+    assert [(s["id"], s["number"]) for s in sprints()] == [
+        (third["id"], 1),
+        (second["id"], 2),
+        (first["id"], 3),
+    ]
+    delete = client.delete(
+        f"/api/v1/sprints/{first['id']}", headers={"If-Match": str(sprints()[2]["version"])}
+    )
+    assert delete.status_code == 204
+    numbered_only = create(client, f"{path}/sprints", {"name": "Sprint 9"})
+    assert (numbered_only["title"], numbered_only["name"]) == ("S3 Sprint 9", "Sprint 9")
+
+
 def test_sprint_description_partial_edits_and_statistics(client, project):
     sprint = create(client, f"/projects/{project['id']}/sprints", {"name": "Legacy-style creation"})
     assert sprint["description"] == ""
@@ -197,6 +248,15 @@ def test_upgrade_keeps_existing_sprint_and_items(tmp_path):
             "INSERT INTO sprints VALUES ('s','p','Existing sprint',1024,'active','2026-11-01',NULL,'2026-11-01','2026-11-01',7)"
         )
         c.exec_driver_sql(
+            "INSERT INTO sprints VALUES ('closed','p','Sprint 8 - Historical',4096,'closed','2026-10-01','2026-10-31','2026-10-01','2026-10-31',5)"
+        )
+        c.exec_driver_sql(
+            "INSERT INTO sprints VALUES ('planned','p','Later work',2048,'planned',NULL,NULL,'2026-11-01','2026-11-01',2)"
+        )
+        c.exec_driver_sql(
+            "INSERT INTO sprints VALUES ('planned-first','p','Earlier work',512,'planned',NULL,NULL,'2026-11-01','2026-11-01',1)"
+        )
+        c.exec_driver_sql(
             "INSERT INTO items VALUES ('i','p',1,'Existing work','','task','in_progress','high',NULL,'u','s',2048,'2026-11-01','2026-11-01',3)"
         )
         c.exec_driver_sql(
@@ -220,7 +280,15 @@ def test_upgrade_keeps_existing_sprint_and_items(tmp_path):
         )
     migrate(engine)
     with transaction(engine, True) as c:
-        sprint = dict(c.execute(select(m.sprints)).mappings().one())
+        rows = {s["id"]: s for s in c.execute(select(m.sprints)).mappings()}
+        assert {key: s["number"] for key, s in rows.items()} == {
+            "closed": 8,
+            "s": 9,
+            "planned-first": 10,
+            "planned": 11,
+        }
+        assert rows["closed"]["name"] == "Sprint 8 - Historical" and rows["closed"]["version"] == 5
+        sprint = rows["s"]
         assert (
             sprint["description"] == "" and sprint["version"] == 7 and sprint["state"] == "active"
         )

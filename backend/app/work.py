@@ -8,6 +8,10 @@ from .errors import require
 from .service import Service, check_version, fingerprint, now, page, public_user, uid
 
 
+def sprint_title(sprint):
+    return f"S{sprint['number']} {sprint['name']}"
+
+
 class WorkService(Service):
     def blockers(self, item_id):
         edges = self.rows(
@@ -47,6 +51,7 @@ class WorkService(Service):
             "key": f"{project['key']}-{item['number']}",
             "project_name": project["name"],
             "sprint_name": sprint["name"] if sprint else "Backlog",
+            "sprint_title": sprint_title(sprint) if sprint else "Backlog",
             "sprint_state": sprint["state"] if sprint else None,
             "assignee": assignee,
             "labels": [self.row(m.labels, id) for id in label_ids],
@@ -781,22 +786,54 @@ class WorkService(Service):
                     {column: {"from": by_id[id][column], "to": value}},
                     resource=resource,
                 )
+        if resource == "sprint":
+            self.renumber_planned_sprints(project_id)
         return {"ordered_ids": ordered_ids}
 
     def sprint_out(self, sprint):
-        result = dict(sprint)
+        result = {**sprint, "title": sprint_title(sprint)}
         if self.can(sprint["project_id"], "item"):
             rows = self.rows(m.items, m.items.c.sprint_id == sprint["id"])
             result["counts"] = {state: sum(i["state"] == state for i in rows) for state in m.STATES}
             result["total"] = len(rows)
         return result
 
+    def renumber_planned_sprints(self, project_id, *, starting_id=None):
+        rows = self.rows(
+            m.sprints,
+            m.sprints.c.project_id == project_id,
+            order=[m.sprints.c.position, m.sprints.c.id],
+        )
+        last_started = max((s["number"] for s in rows if s["state"] != "planned"), default=0)
+        planned = [s for s in rows if s["state"] == "planned"]
+        if starting_id is not None:
+            # Starting out of order takes the next number while preserving the remaining plan.
+            planned.sort(key=lambda s: s["id"] != starting_id)
+        numbered = list(enumerate(planned, last_started + 1))
+        changed_ids = [s["id"] for number, s in numbered if number != s["number"]]
+        if changed_ids:
+            # Park changing numbers before assigning them so swaps satisfy the unique index.
+            self.c.execute(
+                update(m.sprints)
+                .where(m.sprints.c.id.in_(changed_ids))
+                .values(number=-m.sprints.c.number)
+            )
+        started = None
+        for number, sprint in numbered:
+            if sprint["id"] == starting_id:
+                started = self.touch(
+                    m.sprints, sprint, {"number": number, "state": "active", "started_at": now()}
+                )
+            elif number != sprint["number"]:
+                self.touch(m.sprints, sprint, {"number": number})
+        return started
+
     def list_sprints(self, project_id, state=None, offset=0, limit=50):
         self.access(project_id, "sprint")
         rows = self.rows(
             m.sprints,
             m.sprints.c.project_id == project_id,
-            order=[m.sprints.c.position, m.sprints.c.id],
+            order=[m.sprints.c.number],
         )
         return page(
             [self.sprint_out(s) for s in rows if not state or s["state"] == state], offset, limit
@@ -804,18 +841,18 @@ class WorkService(Service):
 
     def create_sprint(self, project_id, name, description=""):
         self.access(project_id, "sprint", "create")
-        position = (
-            self.c.scalar(
-                select(func.max(m.sprints.c.position)).where(m.sprints.c.project_id == project_id)
+        position, number = self.c.execute(
+            select(func.max(m.sprints.c.position), func.max(m.sprints.c.number)).where(
+                m.sprints.c.project_id == project_id
             )
-            or 0
-        ) + 1024
+        ).one()
         sprint = dict(
             id=uid(),
             project_id=project_id,
             name=name,
             description=description,
-            position=position,
+            position=(position or 0) + 1024,
+            number=(number or 0) + 1,
             state="planned",
             started_at=None,
             closed_at=None,
@@ -892,13 +929,13 @@ class WorkService(Service):
                 else "This sprint has open questions. Ask someone with item access to review them.",
                 {"count": question_count} if can_view_items else {},
             )
-        result = self.touch(m.sprints, sprint, {"state": "active", "started_at": now()})
+        result = self.renumber_planned_sprints(sprint["project_id"], starting_id=sprint_id)
         self.record(
             sprint["project_id"],
             None,
             "sprint_started",
             sprint_id,
-            {"started_at": result["started_at"]},
+            {"started_at": result["started_at"], "number": result["number"]},
             resource="sprint",
         )
         return self.sprint_out(result)
@@ -913,12 +950,13 @@ class WorkService(Service):
             "sprint": self.sprint_out(sprint),
             "unfinished": [self.item_out(i) for i in unfinished],
             "destinations": [
-                s
+                {**s, "title": sprint_title(s)}
                 for s in self.rows(
                     m.sprints,
                     m.sprints.c.project_id == sprint["project_id"],
                     m.sprints.c.id != sprint_id,
                     m.sprints.c.state != "closed",
+                    order=[m.sprints.c.number],
                 )
             ],
         }
@@ -978,3 +1016,4 @@ class WorkService(Service):
             resource="sprint",
         )
         self.c.execute(delete(m.sprints).where(m.sprints.c.id == sprint_id))
+        self.renumber_planned_sprints(sprint["project_id"])

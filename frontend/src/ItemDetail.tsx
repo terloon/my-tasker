@@ -160,7 +160,7 @@ function Detail({ itemId }: { itemId: string }) {
             {edge.item.key} · {edge.item.title}
           </Link>
           <div className="small muted">
-            {edge.item.sprint_name} · <State state={edge.item.state} />
+            {edge.item.sprint_title} · <State state={edge.item.state} />
           </div>
         </div>
         {can(i, "item", "update") && (
@@ -446,7 +446,7 @@ function Detail({ itemId }: { itemId: string }) {
             title="Sprint"
             disabled={!can(i, "item", "update") || !can(i, "sprint")}
             value={i.sprint_id || ""}
-            unavailableLabel={i.sprint_name}
+            unavailableLabel={i.sprint_title}
             onChange={(value) =>
               update({ sprint_id: value || null }).catch(() => {})
             }
@@ -456,7 +456,7 @@ function Detail({ itemId }: { itemId: string }) {
                 .filter((s) => s.state !== "closed" || s.id === i.sprint_id)
                 .map((s) => ({
                   value: s.id,
-                  label: s.name + (s.state === "closed" ? " · Closed" : ""),
+                  label: s.title + (s.state === "closed" ? " · Closed" : ""),
                 })) ?? []),
             ]}
           />

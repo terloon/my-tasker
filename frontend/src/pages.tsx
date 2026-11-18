@@ -115,7 +115,7 @@ export function Home() {
                     <Link
                       to={`/projects/${p.id}/sprints/${p.active_sprint.id}`}
                     >
-                      {p.active_sprint.name}
+                      {p.active_sprint.title}
                     </Link>
                   ) : (
                     <span className="muted">No active sprint</span>
@@ -252,7 +252,7 @@ export function ProjectOverview() {
                   <div className="panel between" key={s.id}>
                     <div>
                       <Link to={`/projects/${p.id}/sprints/${s.id}`}>
-                        <strong>{s.name}</strong>
+                        <strong>{s.title}</strong>
                       </Link>
                       <div className="small muted">
                         {label(s.state)}
@@ -452,7 +452,7 @@ export function ItemList() {
             <Multi
               name="Sprints"
               value={params.getAll("sprint_id")}
-              options={sp.data?.items.map((t) => [t.id, t.name]) || []}
+              options={sp.data?.items.map((t) => [t.id, t.title]) || []}
               onChange={(v) => filter("sprint_id", v)}
             />
             <Multi
@@ -746,13 +746,15 @@ export function SprintBoard() {
   const { project, user } = useWorkspace();
   const [params, setParams] = useSearchParams();
   const view = params.get("view") === "board" ? "board" : "overview";
-  const cancelledLanePreference = `planner-hide-cancelled-lane:${user.id}`;
-  const [showCancelled, setShowCancelled] = useState(
-    () => localStorage.getItem(cancelledLanePreference) !== "1",
+  const optionalLanesPreference = `planner-hide-cancelled-lane:${user.id}`;
+  const [showOptionalLanes, setShowOptionalLanes] = useState(
+    () => localStorage.getItem(optionalLanesPreference) !== "1",
   );
-  const lanes = showCancelled
+  const lanes = showOptionalLanes
     ? states
-    : states.filter((state) => state !== "cancelled");
+    : states.filter(
+        (state) => state !== "cancelled" && state !== "open_question",
+      );
   const [editing, setEditing] = useState(false);
   const info = useData<Sprint>(["sprint", sprintId], `/sprints/${sprintId}`);
   const [offsets, setOffsets] = useState<Record<string, number>>({});
@@ -804,7 +806,7 @@ export function SprintBoard() {
   return (
     <>
       <Heading
-        title={sprint.name}
+        title={sprint.title}
         description={
           <>
             {label(sprint.state)}
@@ -817,12 +819,12 @@ export function SprintBoard() {
             <SelectField
               ariaLabel="Choose sprint"
               value={sprint.id}
-              unavailableLabel={sprint.name}
+              unavailableLabel={sprint.title}
               onChange={(value) =>
                 nav(`/projects/${id}/sprints/${value}?view=${view}`)
               }
               options={
-                sp.data?.items.map((s) => ({ value: s.id, label: s.name })) ??
+                sp.data?.items.map((s) => ({ value: s.id, label: s.title })) ??
                 []
               }
             />
@@ -847,7 +849,7 @@ export function SprintBoard() {
                 className="btn primary"
                 disabled={w.busy || !!sprint.counts?.open_question}
                 onClick={async () => {
-                  if (await ask("Start " + sprint.name + "?"))
+                  if (await ask("Start " + sprint.title + "?"))
                     w.execute(() =>
                       api(`/sprints/${sprint.id}/start`, {
                         method: "POST",
@@ -897,15 +899,15 @@ export function SprintBoard() {
             <label className="check small">
               <input
                 type="checkbox"
-                checked={showCancelled}
+                checked={showOptionalLanes}
                 onChange={(e) => {
                   const show = e.currentTarget.checked;
-                  if (show) localStorage.removeItem(cancelledLanePreference);
-                  else localStorage.setItem(cancelledLanePreference, "1");
-                  setShowCancelled(show);
+                  if (show) localStorage.removeItem(optionalLanesPreference);
+                  else localStorage.setItem(optionalLanesPreference, "1");
+                  setShowOptionalLanes(show);
                 }}
               />
-              Show Cancelled lane
+              Show Open Question and Cancelled lanes
             </label>
           )}
           {sprint.state !== "closed" && can(project, "item", "create") && (
